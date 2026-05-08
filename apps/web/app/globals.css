@@ -1,0 +1,300 @@
+:root {
+  --paper: #fdf6ed;
+  --paper-2: #f6ecd9;
+  --ink: #2a1d18;
+  --ink-soft: #8a7568;
+  --rose: #c97a6e;
+  --peach: #f4a787;
+  --gold: #c9a35b;
+  --line: rgba(42, 29, 24, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Gowun Batang', 'Fraunces', serif;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(244, 167, 135, 0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 100% 100%, rgba(201, 122, 110, 0.12) 0%, transparent 50%),
+    var(--paper);
+  color: var(--ink);
+  overflow-x: hidden;
+  line-height: 1.7;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(rgba(42, 29, 24, 0.025) 1px, transparent 1px);
+  background-size: 4px 4px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.petal {
+  position: fixed;
+  pointer-events: none;
+  z-index: 2;
+  color: var(--rose);
+  font-size: 16px;
+  opacity: 0.45;
+  will-change: transform;
+}
+
+.stage {
+  position: relative;
+  z-index: 3;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.label {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.5em;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  margin-bottom: 32px;
+  opacity: 0;
+  transform: translateY(-8px);
+  animation: rise 1s 0.4s ease forwards;
+}
+
+.greeting {
+  font-family: 'Gowun Batang', serif;
+  font-weight: 400;
+  font-size: clamp(40px, 9vw, 96px);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin-bottom: 20px;
+}
+
+.greeting .char {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: rise 0.9s ease forwards;
+}
+
+.greeting .accent {
+  color: var(--rose);
+  font-style: italic;
+  font-family: 'Fraunces', 'Gowun Batang', serif;
+  font-weight: 500;
+}
+
+.sub {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(18px, 2.6vw, 26px);
+  color: var(--ink-soft);
+  margin-top: 16px;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: rise 1s 1.6s ease forwards;
+}
+
+.hand {
+  font-family: 'Caveat', cursive;
+  font-size: clamp(28px, 4.5vw, 44px);
+  color: var(--rose);
+  margin-top: 64px;
+  opacity: 0;
+  transform: translateY(8px) rotate(-2deg);
+  animation: rise 1s 2.2s ease forwards;
+  transform-origin: center;
+}
+
+.heart {
+  margin-top: 72px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  box-shadow:
+    0 4px 16px rgba(42, 29, 24, 0.08),
+    0 12px 32px rgba(244, 167, 135, 0.18);
+  cursor: pointer;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  opacity: 0;
+  animation:
+    rise 1s 2.8s ease forwards,
+    heartbeat 2.4s 4s ease-in-out infinite;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.heart:hover {
+  transform: scale(1.08);
+  box-shadow: 0 8px 24px rgba(244, 167, 135, 0.4);
+}
+
+.heart:active {
+  transform: scale(0.92);
+}
+
+.heart svg {
+  width: 28px;
+  height: 28px;
+  fill: var(--rose);
+}
+
+@keyframes heartbeat {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  20% {
+    transform: scale(1.06);
+  }
+  35% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+  65% {
+    transform: scale(1);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px 24px;
+  text-align: center;
+  font-family: 'Inter', sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.4em;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  opacity: 0.6;
+  z-index: 4;
+}
+
+.note {
+  position: fixed;
+  inset: 0;
+  background: rgba(253, 246, 237, 0.96);
+  backdrop-filter: blur(12px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  z-index: 100;
+  padding: 32px;
+  text-align: center;
+}
+
+.note.open {
+  display: flex;
+  animation: fade 0.6s ease;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.note .text {
+  font-family: 'Caveat', 'Gowun Batang', cursive;
+  font-size: clamp(28px, 5vw, 48px);
+  color: var(--ink);
+  line-height: 1.6;
+  max-width: 540px;
+}
+
+.note .text em {
+  color: var(--rose);
+  font-style: italic;
+}
+
+.note .close {
+  margin-top: 32px;
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.4em;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid var(--line);
+  padding: 10px 22px;
+}
+
+.note .close:hover {
+  border-color: var(--rose);
+  color: var(--rose);
+}
+
+@media (max-width: 768px) {
+  .stage {
+    padding: 32px 18px;
+  }
+  .label {
+    margin-bottom: 24px;
+    font-size: 9px;
+  }
+  .hand {
+    margin-top: 48px;
+  }
+  .heart {
+    margin-top: 56px;
+    width: 56px;
+    height: 56px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .greeting .char,
+  .sub,
+  .label,
+  .hand,
+  .heart {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+}

@@ -1,13 +1,11 @@
 name: CI · api
 
-# Currently disabled — uncomment when apps/api/ is added.
-# Enable by removing `if: false` below.
-
 on:
   push:
     branches: [main]
     paths:
       - 'apps/api/**'
+      - 'charts/menherabot/**'
       - '.github/workflows/ci-api.yml'
   workflow_dispatch:
 
@@ -17,7 +15,6 @@ concurrency:
 
 jobs:
   build-and-publish:
-    if: false
     runs-on: ubuntu-latest
     permissions:
       contents: write
