@@ -1,18 +1,16 @@
 # Single source of truth for the menherabot chart.
 # CI bumps `web.image.tag` (and later `api.image.tag`) directly in this file.
 
-namespace: menherabot           # informational; ArgoCD creates if needed
-
+namespace: menherabot # informational; ArgoCD creates if needed
 global:
   domain: menherabot.hcdev.shop
-  imagePullSecrets: []      # add { name: ghcr-secret } if private images
-
+  imagePullSecrets: [] # add { name: ghcr-secret } if private images
 # ========== Web (frontend) ==========
 web:
   enabled: true
   image:
     repository: ghcr.io/hongchal/menherabot-web
-    tag: sha-c4c38f9        # ⬅ CI overwrites this line via yq on every push to main
+    tag: sha-4b8ddee # ⬅ CI overwrites this line via yq on every push to main
     pullPolicy: IfNotPresent
   replicas: 1
   containerPort: 80
@@ -35,7 +33,6 @@ web:
       path: /healthz
       initialDelaySeconds: 10
       periodSeconds: 30
-
 # ========== API (backend) — disabled until added ==========
 api:
   enabled: false
@@ -55,7 +52,6 @@ api:
     limits:
       cpu: 500m
       memory: 256Mi
-
 # ========== Ingress ==========
 ingress:
   enabled: true
