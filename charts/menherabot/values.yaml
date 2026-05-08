@@ -2,9 +2,11 @@
 # CI bumps `web.image.tag` (and later `api.image.tag`) directly in this file.
 
 namespace: menherabot # informational; ArgoCD creates if needed
+
 global:
   domain: menherabot.hcdev.shop
   imagePullSecrets: [] # add { name: ghcr-secret } if private images
+
 # ========== Web (frontend) ==========
 web:
   enabled: true
@@ -33,6 +35,7 @@ web:
       path: /healthz
       initialDelaySeconds: 10
       periodSeconds: 30
+
 # ========== API (backend) — disabled until added ==========
 api:
   enabled: false
@@ -52,6 +55,35 @@ api:
     limits:
       cpu: 500m
       memory: 256Mi
+
+# ========== Postgres (database) ==========
+postgres:
+  enabled: true
+  image:
+    repository: postgres
+    tag: "16-alpine"
+    pullPolicy: IfNotPresent
+  auth:
+    # ⚠️ Dev defaults — rotate in production via:
+    #    kubectl -n menherabot patch secret menherabot-postgres-auth --type=merge \
+    #      -p '{"stringData":{"POSTGRES_PASSWORD":"<new>"}}'
+    username: menherabot
+    password: change-me-in-prod
+    database: menherabot
+  service:
+    port: 5432
+  persistence:
+    enabled: true
+    size: 1Gi
+    storageClass: "" # "" → cluster default (k3s default = local-path)
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
 # ========== Ingress ==========
 ingress:
   enabled: true
