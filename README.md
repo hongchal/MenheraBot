@@ -7,26 +7,44 @@ Monorepo for `menherabot.hcdev.shop` and (future) related apps.
 ```
 .
 ├── apps/
-│   └── web/                      # frontend (nginx + static)
-│       ├── public/
-│       ├── nginx.conf
-│       └── Dockerfile
+│   ├── web/                      # Next.js 15 (app router, standalone output)
+│   │   ├── app/
+│   │   │   ├── layout.tsx
+│   │   │   ├── page.tsx
+│   │   │   ├── globals.css
+│   │   │   └── api/healthz/route.ts
+│   │   ├── next.config.mjs
+│   │   ├── package.json
+│   │   └── Dockerfile            # multi-stage node:20-alpine
+│   └── api/                      # Go 1.25 + pgx (postgres)
+│       ├── main.go               # /healthz, /api/hello, /api/db-ping
+│       ├── go.mod
+│       └── Dockerfile            # multi-stage golang → distroless/static
 ├── charts/
 │   └── menherabot/               # Helm chart (single values.yaml as source of truth)
 │       ├── Chart.yaml
-│       ├── values.yaml           # CI bumps image tags here directly
-│       └── templates/            # web + (future) api + postgres
+│       ├── values.yaml           # CI bumps web/api image tags here
+│       └── templates/            # web + api + postgres + ingress
 ├── deploy/
 │   └── argocd/
 │       └── application.yaml      # ArgoCD Application manifest
 ├── scripts/
 │   └── check-branch-name.sh      # pre-commit branch name validator
-├── _legacy/                      # raw k8s manifests (reference only)
 └── .github/
     └── workflows/
-        ├── ci-web.yml            # build & push web image, PR-based manifest bump
-        └── ci-api.yml            # placeholder, disabled until apps/api/ exists
+        ├── ci-web.yml            # apps/web → ghcr → bot PR → values.yaml bump
+        └── ci-api.yml            # apps/api → ghcr → bot PR → values.yaml bump
 ```
+
+## Service Topology
+
+| Service  | Image                                | Container | Service | Routed via             |
+| -------- | ------------------------------------ | --------- | ------- | ---------------------- |
+| web      | ghcr.io/hongchal/menherabot-web      | :3000     | :80     | ingress `/`            |
+| api      | ghcr.io/hongchal/menherabot-api      | :8080     | :80     | ingress `/api`         |
+| postgres | postgres:16-alpine                   | :5432     | :5432   | in-cluster only        |
+
+The Go API reads `POSTGRES_HOST/PORT` from `values.yaml` env and `POSTGRES_USER/PASSWORD/DB` from the `menherabot-postgres-auth` Secret (mounted via `envFrom`). It also accepts a fully-formed `DATABASE_URL` if provided.
 
 ## Deployment Architecture (GitOps, Pattern: bot auto-PR)
 
@@ -106,11 +124,24 @@ Examples: `feature/issue-1`, `feature/issue-12-add-auth`, `bugfix/issue-42-fix-l
 # Render chart locally
 helm template menherabot ./charts/menherabot
 
-# Build image locally
+# Web (Next.js)
+cd apps/web && npm install && npm run dev          # http://localhost:3000
 docker build -t menherabot-web:dev apps/web
+docker run -p 3000:3000 menherabot-web:dev
 
-# Run image
-docker run -p 8080:80 menherabot-web:dev
+# API (Go)
+cd apps/api && go run .                            # http://localhost:8080
+docker build -t menherabot-api:dev apps/api
+docker run -p 8080:8080 menherabot-api:dev
+```
+
+### Smoke checks
+
+```bash
+curl -fsS http://localhost:3000/healthz   # web
+curl -fsS http://localhost:8080/healthz   # api
+curl -fsS http://localhost:8080/api/hello
+curl -fsS http://localhost:8080/api/db-ping   # requires postgres reachable
 ```
 
 ## Database (Postgres)

@@ -13,7 +13,35 @@ web:
     tag: sha-abbfb84 # ⬅ CI overwrites this line via yq on every push to main
     pullPolicy: IfNotPresent
   replicas: 1
-  containerPort: 80
+  containerPort: 3000 # Next.js standalone listens on PORT=3000
+  service:
+    type: ClusterIP
+    port: 80
+  resources:
+    requests:
+      cpu: 50m
+      memory: 96Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+  probes:
+    readiness:
+      path: /healthz
+      initialDelaySeconds: 5
+      periodSeconds: 10
+    liveness:
+      path: /healthz
+      initialDelaySeconds: 15
+      periodSeconds: 30
+# ========== API (backend, Go) ==========
+api:
+  enabled: true
+  image:
+    repository: ghcr.io/hongchal/menherabot-api
+    tag: main # CI overwrites via yq on every push to main affecting apps/api/**
+    pullPolicy: IfNotPresent
+  replicas: 1
+  containerPort: 8080
   service:
     type: ClusterIP
     port: 80
@@ -22,7 +50,7 @@ web:
       cpu: 20m
       memory: 32Mi
     limits:
-      cpu: 200m
+      cpu: 300m
       memory: 128Mi
   probes:
     readiness:
@@ -33,25 +61,10 @@ web:
       path: /healthz
       initialDelaySeconds: 10
       periodSeconds: 30
-# ========== API (backend) — disabled until added ==========
-api:
-  enabled: false
-  image:
-    repository: ghcr.io/hongchal/menherabot-api
-    tag: main
-    pullPolicy: IfNotPresent
-  replicas: 1
-  containerPort: 3000
-  service:
-    type: ClusterIP
-    port: 3000
-  resources:
-    requests:
-      cpu: 50m
-      memory: 64Mi
-    limits:
-      cpu: 500m
-      memory: 256Mi
+  # Postgres host injected as plain env; user/password/db come from secret.
+  env:
+    POSTGRES_HOST: menherabot-postgres
+    POSTGRES_PORT: "5432"
 # ========== Postgres (database) ==========
 postgres:
   enabled: true
