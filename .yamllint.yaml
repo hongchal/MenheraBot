@@ -1,0 +1,21 @@
+# Relaxed yamllint config — focus on real errors, not stylistic nitpicks
+extends: relaxed
+
+rules:
+  line-length:
+    max: 200
+    level: warning
+  truthy:
+    # GitHub Actions uses `on:` which yamllint mis-flags
+    check-keys: false
+  comments:
+    require-starting-space: true
+    min-spaces-from-content: 1
+  document-start: disable
+  indentation:
+    spaces: 2
+    indent-sequences: consistent
+
+ignore: |
+  _legacy/
+  charts/*/templates/

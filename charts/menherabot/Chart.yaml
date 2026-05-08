@@ -1,6 +1,6 @@
 apiVersion: v2
 name: menherabot
-description: Syside platform chart (web + future api)
+description: MenheraBot platform chart (web + future api)
 type: application
 version: 0.1.0           # chart version — bump on chart schema changes
 appVersion: "0.1.0"      # app version — informational

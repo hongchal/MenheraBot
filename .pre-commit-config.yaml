@@ -1,0 +1,68 @@
+# See https://pre-commit.com for more information
+# Run manually: pre-commit run --all-files
+# Auto-update hooks: pre-commit autoupdate
+
+repos:
+  # Generic file hygiene
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: '^_legacy/'
+      - id: end-of-file-fixer
+        exclude: '^_legacy/'
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: [--maxkb=500]
+      - id: check-yaml
+        args: [--allow-multiple-documents]
+        # Helm templates contain Go templating syntax → not valid plain YAML
+        exclude: '^charts/.*/templates/.*\.(yaml|yml|tpl)$'
+      - id: check-json
+      - id: mixed-line-ending
+        args: [--fix=lf]
+
+  # YAML linting (relaxed — chart templates excluded above)
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.35.1
+    hooks:
+      - id: yamllint
+        args: ['-c', '.yamllint.yaml']
+        exclude: '^charts/.*/templates/.*'
+
+  # GitHub Actions workflow linting
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.7
+    hooks:
+      - id: actionlint
+
+  # Dockerfile linting
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.13.1-beta
+    hooks:
+      - id: hadolint-docker
+
+  # Local hooks
+  - repo: local
+    hooks:
+      # Enforce branch naming: <type>/issue-<num>[-short-desc]
+      - id: branch-name
+        name: Branch name convention (<type>/issue-N)
+        entry: bash scripts/check-branch-name.sh
+        language: system
+        pass_filenames: false
+        always_run: true
+
+      - id: helm-lint
+        name: helm lint (charts/menherabot)
+        entry: helm lint charts/menherabot
+        language: system
+        pass_filenames: false
+        files: '^charts/menherabot/'
+
+      - id: helm-template
+        name: helm template (charts/menherabot)
+        entry: bash -c 'helm template menherabot charts/menherabot > /dev/null'
+        language: system
+        pass_filenames: false
+        files: '^charts/menherabot/'
