@@ -15,7 +15,7 @@ Monorepo for `menherabot.hcdev.shop` and (future) related apps.
 │   └── menherabot/               # Helm chart (single values.yaml as source of truth)
 │       ├── Chart.yaml
 │       ├── values.yaml           # CI bumps image tags here directly
-│       └── templates/
+│       └── templates/            # web + (future) api + postgres
 ├── deploy/
 │   └── argocd/
 │       └── application.yaml      # ArgoCD Application manifest
@@ -112,6 +112,47 @@ docker build -t menherabot-web:dev apps/web
 # Run image
 docker run -p 8080:80 menherabot-web:dev
 ```
+
+## Database (Postgres)
+
+A simple in-cluster Postgres 16 (alpine) is provisioned by the chart for app-side data.
+
+| Aspect | Value |
+|---|---|
+| Workload | StatefulSet (1 replica) |
+| Storage | 1Gi PVC via cluster default StorageClass (k3s = `local-path`) |
+| Service | `menherabot-postgres.menherabot.svc.cluster.local:5432` (ClusterIP, in-cluster only) |
+| Credentials | Kubernetes Secret `menherabot-postgres-auth` (POSTGRES_USER / POSTGRES_PASSWORD / POSTGRES_DB) |
+| Default user / db | `menherabot` / `menherabot` |
+| Default password | `change-me-in-prod` (rotate before any real use) |
+
+### Connect from inside the cluster
+
+```bash
+# From any pod in `menherabot` namespace
+psql postgres://menherabot:change-me-in-prod@menherabot-postgres:5432/menherabot
+```
+
+### Connect from your laptop (port-forward)
+
+```bash
+kubectl -n menherabot port-forward svc/menherabot-postgres 5432:5432
+psql postgres://menherabot:change-me-in-prod@localhost:5432/menherabot
+```
+
+### Rotating the password
+
+```bash
+kubectl -n menherabot patch secret menherabot-postgres-auth \
+  --type=merge -p '{"stringData":{"POSTGRES_PASSWORD":"<new-password>"}}'
+kubectl -n menherabot rollout restart statefulset/menherabot-postgres
+```
+
+> Postgres reads `POSTGRES_PASSWORD` only on first init. After init, the password lives inside the database. Changing the Secret alone is not enough — also `ALTER USER menherabot PASSWORD '...';` inside Postgres, or wipe the PVC for a fresh init.
+
+### Disable / scale
+
+`postgres.enabled: false` in `values.yaml` removes the StatefulSet, Service, and Secret on the next ArgoCD sync. The PVC is left behind on purpose (data safety) — delete manually with `kubectl delete pvc data-menherabot-postgres-0` if intentional.
 
 ## Versioning
 
