@@ -11,11 +11,10 @@ spec:
     repoURL: https://github.com/hongchal/MenheraBot.git
     targetRevision: main
     path: charts/menherabot
+    # No `helm.valueFiles` — ArgoCD auto-loads the chart's default values.yaml.
+    # Single-source: CI bumps image tags directly into charts/menherabot/values.yaml.
     helm:
       releaseName: menherabot
-      valueFiles:
-        - values.yaml
-        - values-prod.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: menherabot

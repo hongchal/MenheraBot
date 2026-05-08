@@ -17,8 +17,9 @@ jobs:
   build-and-publish:
     runs-on: ubuntu-latest
     permissions:
-      contents: write     # 매니페스트 자동 커밋용
-      packages: write     # ghcr 푸시용
+      contents: write          # bot 브랜치 push
+      packages: write          # ghcr push
+      pull-requests: write     # gh pr create / merge
     steps:
       - uses: actions/checkout@v4
         with:
@@ -52,27 +53,48 @@ jobs:
           cache-from: type=gha,scope=web
           cache-to: type=gha,mode=max,scope=web
 
+      - name: Lint & template Helm chart
+        run: |
+          helm lint charts/menherabot
+          helm template menherabot charts/menherabot > /dev/null
+
       - name: Install yq
         run: |
           sudo wget -qO /usr/local/bin/yq \
             https://github.com/mikefarah/yq/releases/download/v4.44.3/yq_linux_amd64
           sudo chmod +x /usr/local/bin/yq
 
-      - name: Bump image tag in values-prod.yaml
+      - name: Bump image tag in values.yaml
+        id: bump
         run: |
           NEW_TAG="sha-${{ steps.meta.outputs.sha }}"
-          yq -i ".web.image.tag = \"${NEW_TAG}\"" charts/menherabot/values-prod.yaml
-          echo "--- updated values-prod.yaml ---"
-          cat charts/menherabot/values-prod.yaml
-
-      - name: Commit & push manifest update
-        run: |
-          if git diff --quiet charts/menherabot/values-prod.yaml; then
-            echo "no manifest change"
-            exit 0
+          yq -i ".web.image.tag = \"${NEW_TAG}\"" charts/menherabot/values.yaml
+          if git diff --quiet charts/menherabot/values.yaml; then
+            echo "values.yaml already at ${NEW_TAG}, skipping PR"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
+
+      # main 직접 push는 ruleset이 막으므로 PR을 거쳐 자동 머지.
+      # PR 제목에 [skip ci]를 넣어 squash 후 ci-web 무한 재트리거 방지.
+      - name: Open auto-merge PR for manifest bump
+        if: steps.bump.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BR="bot/web-bump-${{ steps.meta.outputs.sha }}"
+          TITLE="chore(web): bump image to sha-${{ steps.meta.outputs.sha }} [skip ci]"
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add charts/menherabot/values-prod.yaml
-          git commit -m "chore(web): bump image to sha-${{ steps.meta.outputs.sha }} [skip ci]"
-          git push
+          git checkout -b "$BR"
+          git add charts/menherabot/values.yaml
+          git commit -m "$TITLE"
+          git push -u origin "$BR"
+          PR_URL=$(gh pr create \
+            --base main \
+            --head "$BR" \
+            --title "$TITLE" \
+            --body "Automated image tag bump from ci-web.yml run #${{ github.run_id }}.")
+          echo "Created PR: $PR_URL"
+          gh pr merge "$PR_URL" --auto --squash --delete-branch

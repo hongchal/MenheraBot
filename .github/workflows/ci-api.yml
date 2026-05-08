@@ -22,18 +22,24 @@ jobs:
     permissions:
       contents: write
       packages: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
       - id: meta
         run: echo "sha=$(echo ${{ github.sha }} | head -c7)" >> $GITHUB_OUTPUT
+
       - uses: docker/setup-buildx-action@v3
+
       - uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
       - uses: docker/build-push-action@v5
         with:
           context: apps/api
@@ -43,15 +49,35 @@ jobs:
             ghcr.io/hongchal/menherabot-api:main
           cache-from: type=gha,scope=api
           cache-to: type=gha,mode=max,scope=api
+
       - run: |
           sudo wget -qO /usr/local/bin/yq \
             https://github.com/mikefarah/yq/releases/download/v4.44.3/yq_linux_amd64
           sudo chmod +x /usr/local/bin/yq
-      - run: yq -i ".api.image.tag = \"sha-${{ steps.meta.outputs.sha }}\"" charts/menherabot/values-prod.yaml
-      - run: |
-          if git diff --quiet charts/menherabot/values-prod.yaml; then exit 0; fi
+
+      - id: bump
+        run: |
+          NEW_TAG="sha-${{ steps.meta.outputs.sha }}"
+          yq -i ".api.image.tag = \"${NEW_TAG}\"" charts/menherabot/values.yaml
+          if git diff --quiet charts/menherabot/values.yaml; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - if: steps.bump.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BR="bot/api-bump-${{ steps.meta.outputs.sha }}"
+          TITLE="chore(api): bump image to sha-${{ steps.meta.outputs.sha }} [skip ci]"
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add charts/menherabot/values-prod.yaml
-          git commit -m "chore(api): bump image to sha-${{ steps.meta.outputs.sha }} [skip ci]"
-          git push
+          git checkout -b "$BR"
+          git add charts/menherabot/values.yaml
+          git commit -m "$TITLE"
+          git push -u origin "$BR"
+          PR_URL=$(gh pr create --base main --head "$BR" \
+            --title "$TITLE" \
+            --body "Automated image tag bump from ci-api.yml run #${{ github.run_id }}.")
+          gh pr merge "$PR_URL" --auto --squash --delete-branch

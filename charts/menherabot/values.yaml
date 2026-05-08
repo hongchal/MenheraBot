@@ -1,5 +1,5 @@
-# Default values for menherabot chart.
-# Production overrides live in values-prod.yaml (image tag bumped by CI).
+# Single source of truth for the menherabot chart.
+# CI bumps `web.image.tag` (and later `api.image.tag`) directly in this file.
 
 namespace: menherabot           # informational; ArgoCD creates if needed
 
@@ -12,7 +12,7 @@ web:
   enabled: true
   image:
     repository: ghcr.io/hongchal/menherabot-web
-    tag: main               # CI overrides this in values-prod.yaml with sha-XXXXXXX
+    tag: sha-c4c38f9        # ⬅ CI overwrites this line via yq on every push to main
     pullPolicy: IfNotPresent
   replicas: 1
   containerPort: 80

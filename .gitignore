@@ -8,3 +8,6 @@ build/
 _legacy/
 .vscode/
 .idea/
+
+# bkit local state (per-machine, do not commit)
+.bkit/
