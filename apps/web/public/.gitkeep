@@ -1,0 +1,2 @@
+# Placeholder so Next.js Dockerfile's `COPY --from=builder /app/public`
+# step succeeds even when there are no static assets yet.
