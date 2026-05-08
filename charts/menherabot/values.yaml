@@ -38,7 +38,7 @@ api:
   enabled: true
   image:
     repository: ghcr.io/hongchal/menherabot-api
-    tag: main # CI overwrites via yq on every push to main affecting apps/api/**
+    tag: sha-6520859 # CI overwrites via yq on every push to main affecting apps/api/**
     pullPolicy: IfNotPresent
   replicas: 1
   containerPort: 8080
