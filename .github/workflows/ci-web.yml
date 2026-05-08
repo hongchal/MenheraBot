@@ -97,4 +97,7 @@ jobs:
             --title "$TITLE" \
             --body "Automated image tag bump from ci-web.yml run #${{ github.run_id }}.")
           echo "Created PR: $PR_URL"
-          gh pr merge "$PR_URL" --auto --squash --delete-branch
+          # `--auto` errors with "clean status" when no required checks gate the
+          # PR, so fall back to a direct merge in that case.
+          gh pr merge "$PR_URL" --auto --squash --delete-branch \
+            || gh pr merge "$PR_URL" --squash --delete-branch
