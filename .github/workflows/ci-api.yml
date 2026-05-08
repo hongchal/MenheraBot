@@ -1,0 +1,57 @@
+name: CI · api
+
+# Currently disabled — uncomment when apps/api/ is added.
+# Enable by removing `if: false` below.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/api/**'
+      - '.github/workflows/ci-api.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: ci-api-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-publish:
+    if: false
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: meta
+        run: echo "sha=$(echo ${{ github.sha }} | head -c7)" >> $GITHUB_OUTPUT
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v5
+        with:
+          context: apps/api
+          push: true
+          tags: |
+            ghcr.io/hongchal/menherabot-api:sha-${{ steps.meta.outputs.sha }}
+            ghcr.io/hongchal/menherabot-api:main
+          cache-from: type=gha,scope=api
+          cache-to: type=gha,mode=max,scope=api
+      - run: |
+          sudo wget -qO /usr/local/bin/yq \
+            https://github.com/mikefarah/yq/releases/download/v4.44.3/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+      - run: yq -i ".api.image.tag = \"sha-${{ steps.meta.outputs.sha }}\"" charts/menherabot/values-prod.yaml
+      - run: |
+          if git diff --quiet charts/menherabot/values-prod.yaml; then exit 0; fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add charts/menherabot/values-prod.yaml
+          git commit -m "chore(api): bump image to sha-${{ steps.meta.outputs.sha }} [skip ci]"
+          git push

@@ -1,0 +1,5 @@
+# Production overrides. CI updates the tag below on every successful build.
+
+web:
+  image:
+    tag: main              # ⬅ CI overwrites this line via yq
