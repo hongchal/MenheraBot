@@ -58,6 +58,27 @@ jobs:
           helm lint charts/menherabot
           helm template menherabot charts/menherabot > /dev/null
 
+      # DEEPSEEK_API_KEY is injected into the cluster out-of-band (never in git).
+      # Uses the restricted `gha-deployer` kubeconfig (secrets + named-deploy
+      # patch only, in the menherabot namespace).
+      - name: Sync DEEPSEEK_API_KEY secret to cluster
+        env:
+          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          if [ -z "$KUBE_CONFIG_DATA" ] || [ -z "$DEEPSEEK_API_KEY" ]; then
+            echo "::warning::KUBE_CONFIG_DATA or DEEPSEEK_API_KEY missing — skipping secret sync"
+            exit 0
+          fi
+          mkdir -p "$HOME/.kube"
+          echo "$KUBE_CONFIG_DATA" | base64 -d > "$HOME/.kube/config"
+          chmod 600 "$HOME/.kube/config"
+          kubectl -n menherabot create secret generic menherabot-web-env \
+            --from-literal=DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+            --dry-run=client -o yaml | kubectl apply -f -
+          # Roll web pods so a rotated key takes effect even without an image bump.
+          kubectl -n menherabot rollout restart deploy/menherabot-web || true
+
       - name: Install yq
         run: |
           sudo wget -qO /usr/local/bin/yq \

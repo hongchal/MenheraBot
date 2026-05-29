@@ -41,11 +41,15 @@ spec:
               port: http
             initialDelaySeconds: {{ .Values.web.probes.liveness.initialDelaySeconds }}
             periodSeconds: {{ .Values.web.probes.liveness.periodSeconds }}
-          {{- if .Values.web.deepseekApiKey }}
+          # The `-env` secret carries DEEPSEEK_API_KEY. In prod it is created
+          # out-of-band by CI (kubectl apply via the gha-deployer kubeconfig) so
+          # the key never lands in git; for local dev it can still be rendered
+          # from .Values.web.deepseekApiKey (web-secret.yaml).
+          # optional:true → pod starts even if the secret is not present yet.
           envFrom:
             - secretRef:
                 name: {{ include "menherabot.web.fullname" . }}-env
-          {{- end }}
+                optional: true
           resources:
             {{- toYaml .Values.web.resources | nindent 12 }}
 {{- end }}
