@@ -74,7 +74,7 @@ export default function MenheraBot() {
     setResult(null);
     setError('');
     try {
-      const res = await fetch('/api/judge', {
+      const res = await fetch('/internal/judge', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ situation, tone }),
