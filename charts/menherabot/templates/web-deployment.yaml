@@ -41,10 +41,14 @@ spec:
               port: http
             initialDelaySeconds: {{ .Values.web.probes.liveness.initialDelaySeconds }}
             periodSeconds: {{ .Values.web.probes.liveness.periodSeconds }}
-          # The `-env` secret carries DEEPSEEK_API_KEY. In prod it is created
-          # out-of-band by CI (kubectl apply via the gha-deployer kubeconfig) so
-          # the key never lands in git; for local dev it can still be rendered
-          # from .Values.web.deepseekApiKey (web-secret.yaml).
+          # The `-env` secret carries DEEPSEEK_API_KEY. In prod it is managed
+          # directly as a k8s Secret (kubectl), not via git, so the key never
+          # lands in the repo; for local dev it can still be rendered from
+          # .Values.web.deepseekApiKey (web-secret.yaml).
+          #   kubectl -n menherabot create secret generic menherabot-web-env \
+          #     --from-literal=DEEPSEEK_API_KEY=<key> --dry-run=client -o yaml \
+          #     | kubectl apply -f -
+          # ArgoCD does not manage this secret (not in chart) → no prune.
           # optional:true → pod starts even if the secret is not present yet.
           envFrom:
             - secretRef:
