@@ -17,7 +17,7 @@ const SYSTEM_PROMPT = `너는 "멘헤라 봇"이야. 연인/지인 중 상대방
 }`;
 
 export async function POST(req: NextRequest) {
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.DEEPSEEK_API_KEY;
   if (!apiKey) {
     return NextResponse.json({ error: 'API key not configured' }, { status: 500 });
   }
@@ -27,25 +27,29 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
   }
 
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
-        contents: [{ role: 'user', parts: [{ text: `해석 레벨: ${tone}\n상황: ${situation}` }] }],
-        generationConfig: { maxOutputTokens: 1000 },
-      }),
-    }
-  );
+  const res = await fetch('https://api.deepseek.com/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: 'deepseek-chat',
+      max_tokens: 2048,
+      messages: [
+        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'user', content: `해석 레벨: ${tone}\n상황: ${situation}` },
+      ],
+    }),
+  });
 
   if (!res.ok) {
-    return NextResponse.json({ error: 'Gemini API error' }, { status: res.status });
+    const errBody = await res.text();
+    return NextResponse.json({ error: 'DeepSeek API error', detail: errBody }, { status: res.status });
   }
 
   const data = await res.json();
-  const text: string = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  const text: string = data.choices?.[0]?.message?.content || '';
   const clean = text.replace(/```json|```/g, '').trim();
 
   return NextResponse.json(JSON.parse(clean));
