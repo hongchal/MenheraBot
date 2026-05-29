@@ -17,7 +17,7 @@ const SYSTEM_PROMPT = `너는 "멘헤라 봇"이야. 연인/지인 중 상대방
 }`;
 
 export async function POST(req: NextRequest) {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.DEEPSEEK_API_KEY;
   if (!apiKey) {
     return NextResponse.json({ error: 'API key not configured' }, { status: 500 });
   }
@@ -27,27 +27,29 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
   }
 
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
+  const res = await fetch('https://api.deepseek.com/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
+      'Authorization': `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1000,
-      system: SYSTEM_PROMPT,
-      messages: [{ role: 'user', content: `해석 레벨: ${tone}\n상황: ${situation}` }],
+      model: 'deepseek-chat',
+      max_tokens: 2048,
+      messages: [
+        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'user', content: `해석 레벨: ${tone}\n상황: ${situation}` },
+      ],
     }),
   });
 
   if (!res.ok) {
-    return NextResponse.json({ error: 'Anthropic API error' }, { status: res.status });
+    const errBody = await res.text();
+    return NextResponse.json({ error: 'DeepSeek API error', detail: errBody }, { status: res.status });
   }
 
   const data = await res.json();
-  const text: string = data.content?.find((b: { type: string }) => b.type === 'text')?.text || '';
+  const text: string = data.choices?.[0]?.message?.content || '';
   const clean = text.replace(/```json|```/g, '').trim();
 
   return NextResponse.json(JSON.parse(clean));

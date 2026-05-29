@@ -33,6 +33,7 @@ web:
       path: /healthz
       initialDelaySeconds: 15
       periodSeconds: 30
+  deepseekApiKey: "" # set via --set web.deepseekApiKey=... or a sealed secret
 # ========== API (backend, Go) ==========
 api:
   enabled: true
