@@ -33,6 +33,7 @@ web:
       path: /healthz
       initialDelaySeconds: 15
       periodSeconds: 30
+  geminiApiKey: "" # set via --set web.geminiApiKey=... or a sealed secret
 # ========== API (backend, Go) ==========
 api:
   enabled: true

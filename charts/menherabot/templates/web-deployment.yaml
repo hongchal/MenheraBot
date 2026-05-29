@@ -41,6 +41,11 @@ spec:
               port: http
             initialDelaySeconds: {{ .Values.web.probes.liveness.initialDelaySeconds }}
             periodSeconds: {{ .Values.web.probes.liveness.periodSeconds }}
+          {{- if .Values.web.geminiApiKey }}
+          envFrom:
+            - secretRef:
+                name: {{ include "menherabot.web.fullname" . }}-env
+          {{- end }}
           resources:
             {{- toYaml .Values.web.resources | nindent 12 }}
 {{- end }}
