@@ -70,6 +70,17 @@ export default function Home() {
 
   return (
     <>
+      <style>{`
+        body::before {
+          content: '';
+          position: fixed;
+          inset: 0;
+          background-image: radial-gradient(rgba(42, 29, 24, 0.025) 1px, transparent 1px);
+          background-size: 4px 4px;
+          pointer-events: none;
+          z-index: 1;
+        }
+      `}</style>
       <div className="stage">
         <div className="label">— for sy —</div>
 

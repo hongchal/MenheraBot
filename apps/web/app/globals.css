@@ -33,15 +33,6 @@ body {
   min-height: 100dvh;
 }
 
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: radial-gradient(rgba(42, 29, 24, 0.025) 1px, transparent 1px);
-  background-size: 4px 4px;
-  pointer-events: none;
-  z-index: 1;
-}
 
 .petal {
   position: fixed;
