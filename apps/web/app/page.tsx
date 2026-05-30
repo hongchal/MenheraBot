@@ -374,16 +374,6 @@ export default function MenheraBot() {
             {/* 감정 태그 + emotion 카드 */}
             {visibleCount >= structured.messages.length && (
               <div style={{ marginTop: 16 }}>
-                <div style={{ paddingLeft: 46, marginBottom: 16 }}>
-                  <span style={{
-                    background: `${emotionColor}20`, color: emotionColor,
-                    fontSize: 11, fontWeight: 600,
-                    padding: "3px 10px", borderRadius: 20,
-                    border: `0.5px solid ${emotionColor}40`,
-                  }}>
-                    # {structured.emotion_label}
-                  </span>
-                </div>
                 {structured.emotion && (
                   <div style={{
                     background: "#141414",
