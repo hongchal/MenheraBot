@@ -468,22 +468,12 @@ export default function MenheraBot() {
               <TempGauge value={structured.temperature} />
 
               {/* 판단 */}
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "baseline",
-                }}
-              >
-                <Label>판단</Label>
-                <p style={{ fontSize: 15, fontWeight: 700, margin: 0 }}>
-                  {structured.verdict}
-                </p>
-              </div>
+              <p style={{ fontSize: 15, fontWeight: 700, margin: "16px 0 20px" }}>
+                {structured.verdict}
+              </p>
 
               {/* 말풍선 */}
-              <Label>분석 {toneEmoji}</Label>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 {structured.messages.slice(0, visibleCount).map((msg, i) => (
                   <div
                     key={i}
@@ -500,7 +490,8 @@ export default function MenheraBot() {
                           width: 28,
                           height: 28,
                           borderRadius: "50%",
-                          background: "#111111",
+                          background: "#fff",
+                          border: "1px solid #111111",
                           flexShrink: 0,
                           display: "flex",
                           alignItems: "center",
@@ -514,8 +505,8 @@ export default function MenheraBot() {
                     {i > 0 && <div style={{ width: 28, flexShrink: 0 }} />}
                     <div
                       style={{
-                        background: "#F0F0F0",
-                        borderRadius: i === 0 ? "4px 14px 14px 14px" : "14px",
+                        background: "#111111",
+                        borderRadius: 0,
                         padding: "10px 14px",
                         maxWidth: "85%",
                       }}
@@ -525,7 +516,7 @@ export default function MenheraBot() {
                           fontSize: 14,
                           lineHeight: 1.6,
                           margin: 0,
-                          color: "#111111",
+                          color: "#fff",
                         }}
                       >
                         {msg}
