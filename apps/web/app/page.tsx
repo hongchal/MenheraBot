@@ -18,7 +18,7 @@ const RELATIONS = [
 ];
 
 const ACCENT = "#8B1A2F";
-const LINE = "1px solid #000";
+const LINE = "1px solid #111111";
 
 interface Emotion {
   reflection: string;
@@ -43,7 +43,7 @@ function Label({ children }: { children: React.ReactNode }) {
         fontSize: 11,
         fontWeight: 700,
         letterSpacing: "0.1em",
-        color: "#000",
+        color: "#111111",
         margin: "0 0 10px",
         textTransform: "uppercase",
       }}
@@ -59,7 +59,7 @@ function Divider() {
 
 function TempGauge({ value }: { value: number }) {
   const isHot = value >= 70;
-  const color = isHot ? ACCENT : "#000";
+  const color = isHot ? ACCENT : "#111111";
   const statusKo =
     value < 30
       ? "냉담"
@@ -270,7 +270,7 @@ export default function MenheraBot() {
         minHeight: "100vh",
         background: "#fff",
         fontFamily: "Pretendard, -apple-system, sans-serif",
-        color: "#000",
+        color: "#111111",
       }}
     >
       <link
@@ -320,10 +320,10 @@ export default function MenheraBot() {
                 onClick={() => setRelation(r.key)}
                 style={{
                   padding: "5px 12px",
-                  background: relation === r.key ? "#000" : "#fff",
+                  background: relation === r.key ? "#111111" : "#fff",
                   border: LINE,
                   cursor: "pointer",
-                  color: relation === r.key ? "#fff" : "#000",
+                  color: relation === r.key ? "#fff" : "#111111",
                   fontSize: 12,
                   fontWeight: 600,
                   fontFamily: "inherit",
@@ -346,7 +346,7 @@ export default function MenheraBot() {
                 border: "none",
                 borderBottom: LINE,
                 padding: "8px 0",
-                color: "#000",
+                color: "#111111",
                 fontFamily: "inherit",
                 fontSize: 14,
                 outline: "none",
@@ -370,7 +370,7 @@ export default function MenheraBot() {
               border: "none",
               borderBottom: LINE,
               padding: "0 0 8px",
-              color: "#000",
+              color: "#111111",
               fontFamily: "inherit",
               fontSize: 15,
               lineHeight: 1.7,
@@ -393,11 +393,11 @@ export default function MenheraBot() {
                 style={{
                   flex: 1,
                   padding: "10px 4px",
-                  background: tone === t.key ? "#000" : "#fff",
+                  background: tone === t.key ? "#111111" : "#fff",
                   border: "none",
                   borderLeft: i > 0 ? LINE : "none",
                   cursor: "pointer",
-                  color: tone === t.key ? "#fff" : "#000",
+                  color: tone === t.key ? "#fff" : "#111111",
                   fontFamily: "inherit",
                   fontSize: 12,
                   fontWeight: 600,
@@ -424,9 +424,9 @@ export default function MenheraBot() {
             style={{
               width: "100%",
               padding: "14px",
-              background: loading || !situation.trim() ? "#fff" : ACCENT,
+              background: loading || !situation.trim() ? "#fff" : "#111111",
               border: `1px solid ${
-                loading || !situation.trim() ? "#ccc" : ACCENT
+                loading || !situation.trim() ? "#ccc" : "#111111"
               }`,
               cursor: loading || !situation.trim() ? "not-allowed" : "pointer",
               color: loading || !situation.trim() ? "#ccc" : "#fff",
@@ -459,7 +459,7 @@ export default function MenheraBot() {
           <div ref={resultRef}>
             <div
               style={{
-                borderTop: "2px solid #000",
+                borderTop: "2px solid #111111",
                 paddingTop: 20,
                 marginTop: 4,
               }}
@@ -500,7 +500,7 @@ export default function MenheraBot() {
                           width: 28,
                           height: 28,
                           borderRadius: "50%",
-                          background: "#000",
+                          background: "#111111",
                           flexShrink: 0,
                           display: "flex",
                           alignItems: "center",
@@ -525,7 +525,7 @@ export default function MenheraBot() {
                           fontSize: 14,
                           lineHeight: 1.6,
                           margin: 0,
-                          color: "#000",
+                          color: "#111111",
                         }}
                       >
                         {msg}
@@ -575,7 +575,7 @@ export default function MenheraBot() {
                           lineHeight: 1.7,
                           margin: 0,
                           fontWeight: 600,
-                          color: "#000",
+                          color: "#111111",
                         }}
                       >
                         {structured.emotion.action}
