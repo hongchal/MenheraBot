@@ -71,6 +71,12 @@ export default function Home() {
   return (
     <>
       <style>{`
+        body {
+          background:
+            radial-gradient(ellipse 80% 60% at 50% -10%, rgba(244, 167, 135, 0.18) 0%, transparent 60%),
+            radial-gradient(ellipse 60% 50% at 100% 100%, rgba(201, 122, 110, 0.12) 0%, transparent 50%),
+            #fdf6ed;
+        }
         body::before {
           content: '';
           position: fixed;
