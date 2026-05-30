@@ -486,7 +486,7 @@ export default function MenheraBot() {
                       flexShrink: 0,
                     }}
                   >
-                    👿
+                    {TONES.find((t) => t.key === tone)?.emoji}
                   </div>
                   <div style={{ flex: 1 }}>
                     {i === 0 && (
@@ -548,38 +548,97 @@ export default function MenheraBot() {
                       내 마음 들여다보기
                     </span>{" "}
                   </div>
-                  <div style={{ background: "#141414", borderRadius: 8, padding: "16px 18px" }}>
+                  <div
+                    style={{
+                      background: "#141414",
+                      borderRadius: 8,
+                      padding: "16px 18px",
+                    }}
+                  >
                     {/* reflection + normalize + origin */}
                     {/* 섹션 1: reflection + normalize + origin */}
-                    <p style={{ fontSize: 13, color: "#aaa", lineHeight: 2, margin: 0 }}>
-                      {structured.emotion.reflection} {structured.emotion.normalize} {structured.emotion.origin}
+                    <p
+                      style={{
+                        fontSize: 13,
+                        color: "#aaa",
+                        lineHeight: 2,
+                        margin: 0,
+                      }}
+                    >
+                      {structured.emotion.reflection}{" "}
+                      {structured.emotion.normalize} {structured.emotion.origin}
                     </p>
 
-                    <div style={{ height: "0.5px", background: "#222", margin: "16px 0" }} />
+                    <div
+                      style={{
+                        height: "0.5px",
+                        background: "#222",
+                        margin: "16px 0",
+                      }}
+                    />
 
                     {/* 섹션 2: action 강조 박스 */}
-                    <div style={{
-                      background: "#0d0d0d",
-                      border: "0.5px solid #333",
-                      borderRadius: 8,
-                      padding: "12px 14px",
-                    }}>
-                      <div style={{ fontSize: 10, color: "#555", fontWeight: 600, marginBottom: 6, letterSpacing: "0.05em" }}>
+                    <div
+                      style={{
+                        background: "#0d0d0d",
+                        border: "0.5px solid #333",
+                        borderRadius: 8,
+                        padding: "12px 14px",
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: 10,
+                          color: "#555",
+                          fontWeight: 600,
+                          marginBottom: 6,
+                          letterSpacing: "0.05em",
+                        }}
+                      >
                         지금 해볼 것
                       </div>
-                      <p style={{ fontSize: 13, color: "#e0e0e0", lineHeight: 1.8, margin: 0, fontWeight: 500 }}>
+                      <p
+                        style={{
+                          fontSize: 13,
+                          color: "#e0e0e0",
+                          lineHeight: 1.8,
+                          margin: 0,
+                          fontWeight: 500,
+                        }}
+                      >
                         {structured.emotion.action}
                       </p>
                     </div>
 
-                    <div style={{ height: "0.5px", background: "#222", margin: "16px 0" }} />
+                    <div
+                      style={{
+                        height: "0.5px",
+                        background: "#222",
+                        margin: "16px 0",
+                      }}
+                    />
 
                     {/* 섹션 3: reframe */}
                     <div>
-                      <div style={{ fontSize: 10, color: "#444", fontWeight: 600, marginBottom: 6, letterSpacing: "0.05em" }}>
+                      <div
+                        style={{
+                          fontSize: 10,
+                          color: "#444",
+                          fontWeight: 600,
+                          marginBottom: 6,
+                          letterSpacing: "0.05em",
+                        }}
+                      >
                         한 걸음 물러서서
                       </div>
-                      <p style={{ fontSize: 13, color: "#777", lineHeight: 2, margin: 0 }}>
+                      <p
+                        style={{
+                          fontSize: 13,
+                          color: "#777",
+                          lineHeight: 2,
+                          margin: 0,
+                        }}
+                      >
                         {structured.emotion.reframe}
                       </p>
                     </div>
