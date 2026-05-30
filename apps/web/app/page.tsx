@@ -57,7 +57,7 @@ function TempGauge({ value }: { value: number }) {
       >
         <span
           style={{
-            fontFamily: "'Noto Serif KR', serif",
+            fontFamily: "Pretendard, sans-serif",
             fontSize: 13,
             color: "#888",
             letterSpacing: "0.05em",
@@ -67,7 +67,7 @@ function TempGauge({ value }: { value: number }) {
         </span>
         <span
           style={{
-            fontFamily: "'DM Mono', monospace",
+            fontFamily: "Pretendard, sans-serif",
             fontSize: 42,
             fontWeight: 400,
             color,
@@ -107,7 +107,7 @@ function TempGauge({ value }: { value: number }) {
       >
         <span
           style={{
-            fontFamily: "'DM Mono', monospace",
+            fontFamily: "Pretendard, sans-serif",
             fontSize: 10,
             color: "#555",
           }}
@@ -116,7 +116,7 @@ function TempGauge({ value }: { value: number }) {
         </span>
         <span
           style={{
-            fontFamily: "'DM Mono', monospace",
+            fontFamily: "Pretendard, sans-serif",
             fontSize: 11,
             color,
             letterSpacing: "0.05em",
@@ -126,7 +126,7 @@ function TempGauge({ value }: { value: number }) {
         </span>
         <span
           style={{
-            fontFamily: "'DM Mono', monospace",
+            fontFamily: "Pretendard, sans-serif",
             fontSize: 10,
             color: "#555",
           }}
@@ -190,12 +190,12 @@ export default function MenheraBot() {
       style={{
         minHeight: "100vh",
         background: "#0d0d0d",
-        fontFamily: "'Noto Sans KR', sans-serif",
+        fontFamily: "Pretendard, sans-serif",
         padding: "0 0 80px",
       }}
     >
       <link
-        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500&family=Noto+Serif+KR:wght@400;600&family=DM+Mono:wght@400;500&display=swap"
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"
         rel="stylesheet"
       />
 
@@ -206,7 +206,7 @@ export default function MenheraBot() {
         <div style={{ maxWidth: 480, margin: "0 auto" }}>
           <h1
             style={{
-              fontFamily: "'Noto Serif KR', serif",
+              fontFamily: "Pretendard, sans-serif",
               fontSize: 28,
               fontWeight: 600,
               color: "#f0f0f0",
@@ -220,7 +220,7 @@ export default function MenheraBot() {
           </h1>
           <p
             style={{
-              fontFamily: "'DM Mono', monospace",
+              fontFamily: "Pretendard, sans-serif",
               fontSize: 11,
               color: "#555",
               marginTop: 10,
@@ -239,7 +239,7 @@ export default function MenheraBot() {
           <label
             style={{
               display: "block",
-              fontFamily: "'DM Mono', monospace",
+              fontFamily: "Pretendard, sans-serif",
               fontSize: 10,
               color: "#666",
               letterSpacing: "0.12em",
@@ -260,7 +260,7 @@ export default function MenheraBot() {
               borderRadius: 4,
               padding: "14px 16px",
               color: "#e0e0e0",
-              fontFamily: "'Noto Sans KR', sans-serif",
+              fontFamily: "Pretendard, sans-serif",
               fontSize: 14,
               lineHeight: 1.7,
               resize: "none",
@@ -278,7 +278,7 @@ export default function MenheraBot() {
           <label
             style={{
               display: "block",
-              fontFamily: "'DM Mono', monospace",
+              fontFamily: "Pretendard, sans-serif",
               fontSize: 10,
               color: "#666",
               letterSpacing: "0.12em",
@@ -302,7 +302,7 @@ export default function MenheraBot() {
                   borderRadius: 4,
                   cursor: "pointer",
                   color: tone === t.key ? "#0d0d0d" : "#666",
-                  fontFamily: "'Noto Sans KR', sans-serif",
+                  fontFamily: "Pretendard, sans-serif",
                   fontSize: 12,
                   fontWeight: tone === t.key ? 500 : 300,
                   transition: "all 0.15s",
@@ -327,7 +327,7 @@ export default function MenheraBot() {
             borderRadius: 4,
             cursor: loading || !situation.trim() ? "not-allowed" : "pointer",
             color: loading || !situation.trim() ? "#444" : "#0d0d0d",
-            fontFamily: "'Noto Sans KR', sans-serif",
+            fontFamily: "Pretendard, sans-serif",
             fontSize: 14,
             fontWeight: 500,
             letterSpacing: "0.05em",
@@ -340,7 +340,7 @@ export default function MenheraBot() {
         {error && (
           <p
             style={{
-              fontFamily: "'DM Mono', monospace",
+              fontFamily: "Pretendard, sans-serif",
               fontSize: 12,
               color: "#E57373",
               marginTop: 12,
@@ -367,7 +367,7 @@ export default function MenheraBot() {
               <TempGauge value={result.temperature} />
               <div
                 style={{
-                  fontFamily: "'Noto Serif KR', serif",
+                  fontFamily: "Pretendard, sans-serif",
                   fontSize: 13,
                   color: "#888",
                   marginTop: 4,
@@ -392,18 +392,18 @@ export default function MenheraBot() {
             >
               <div
                 style={{
-                  fontFamily: "'DM Mono', monospace",
+                  fontFamily: "Pretendard, sans-serif",
                   fontSize: 10,
                   color: "#555",
                   letterSpacing: "0.12em",
                   marginBottom: 12,
                 }}
               >
-                AI INTERPRETATION
+                행동 해석
               </div>
               <p
                 style={{
-                  fontFamily: "'Noto Sans KR', sans-serif",
+                  fontFamily: "Pretendard, sans-serif",
                   fontSize: 14,
                   color: "#ccc",
                   lineHeight: 1.85,
@@ -434,19 +434,19 @@ export default function MenheraBot() {
               >
                 <div
                   style={{
-                    fontFamily: "'DM Mono', monospace",
+                    fontFamily: "Pretendard, sans-serif",
                     fontSize: 10,
                     color: "#555",
                     letterSpacing: "0.12em",
                   }}
                 >
-                  EMOTION TRANSLATION
+                  감정 번역
                 </div>
                 <div
                   style={{
                     background: `${emotionColor}20`,
                     color: emotionColor,
-                    fontFamily: "'DM Mono', monospace",
+                    fontFamily: "Pretendard, sans-serif",
                     fontSize: 10,
                     padding: "2px 8px",
                     borderRadius: 2,
@@ -458,7 +458,7 @@ export default function MenheraBot() {
               </div>
               <p
                 style={{
-                  fontFamily: "'Noto Serif KR', serif",
+                  fontFamily: "Pretendard, sans-serif",
                   fontSize: 14,
                   color: "#bbb",
                   lineHeight: 1.9,
