@@ -152,6 +152,7 @@ export default function MenheraBot() {
   const [customRelation, setCustomRelation] = useState("");
   const [tone, setTone] = useState("menhera");
   const [structured, setStructured] = useState<Structured | null>(null);
+  const [submittedTone, setSubmittedTone] = useState("menhera");
   const [visibleCount, setVisibleCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -161,6 +162,7 @@ export default function MenheraBot() {
     if (!situation.trim()) return;
     setLoading(true);
     setStructured(null);
+    setSubmittedTone(tone);
     setVisibleCount(0);
     setError("");
 
@@ -486,7 +488,7 @@ export default function MenheraBot() {
                       flexShrink: 0,
                     }}
                   >
-                    {TONES.find((t) => t.key === tone)?.emoji}
+                    {TONES.find((t) => t.key === submittedTone)?.emoji}
                   </div>
                   <div style={{ flex: 1 }}>
                     {i === 0 && (
