@@ -163,7 +163,10 @@ export default function MenheraBot() {
         body: JSON.stringify({
           situation,
           tone,
-          relation: relation === "직접입력" ? (customRelation.trim() || "기타") : relation,
+          relation:
+            relation === "직접입력"
+              ? customRelation.trim() || "기타"
+              : relation,
         }),
       });
       if (!res.ok) throw new Error();
@@ -259,14 +262,19 @@ export default function MenheraBot() {
             상대방
           </label>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            {[...RELATIONS, { key: "직접입력", label: "직접 입력", emoji: "✏️" }].map((r) => (
+            {[
+              ...RELATIONS,
+              { key: "직접입력", label: "직접 입력", emoji: "✏️" },
+            ].map((r) => (
               <button
                 key={r.key}
                 onClick={() => setRelation(r.key)}
                 style={{
                   padding: "7px 14px",
                   background: relation === r.key ? "#f0f0f0" : "transparent",
-                  border: `0.5px solid ${relation === r.key ? "#f0f0f0" : "#2a2a2a"}`,
+                  border: `0.5px solid ${
+                    relation === r.key ? "#f0f0f0" : "#2a2a2a"
+                  }`,
                   borderRadius: 20,
                   cursor: "pointer",
                   color: relation === r.key ? "#0d0d0d" : "#666",
@@ -279,7 +287,8 @@ export default function MenheraBot() {
                   gap: 4,
                 }}
               >
-                <span>{r.emoji}</span>{r.label}
+                <span>{r.emoji}</span>
+                {r.label}
               </button>
             ))}
           </div>
@@ -287,7 +296,7 @@ export default function MenheraBot() {
             <input
               value={customRelation}
               onChange={(e) => setCustomRelation(e.target.value)}
-              placeholder="예: 전 남자친구, 선배, 오빠..."
+              placeholder="예: 전 애인, 오랜만에 만나 친구..."
               style={{
                 marginTop: 10,
                 width: "100%",
@@ -508,30 +517,27 @@ export default function MenheraBot() {
               ))}
             </div>
 
-            {/* 감정 태그 + emotion 카드 */}
-            {visibleCount >= structured.messages.length && (
-              <div style={{ marginTop: 16 }}>
-                {structured.emotion && (
-                  <div
-                    style={{
-                      background: "#141414",
-                      borderRadius: 8,
-                      padding: "16px 18px",
-                    }}
-                  >
-                    <p
-                      style={{
-                        fontSize: 13,
-                        color: "#aaa",
-                        lineHeight: 2,
-                        margin: 0,
-                        whiteSpace: "pre-wrap",
-                      }}
-                    >
-                      {structured.emotion}
-                    </p>
-                  </div>
-                )}
+            {/* 내 마음 들여다보기 */}
+            {visibleCount >= structured.messages.length && structured.emotion && (
+              <div style={{ marginTop: 32 }}>
+                <div style={{
+                  display: "flex", alignItems: "center", gap: 8,
+                  marginBottom: 12,
+                }}>
+                  <div style={{ flex: 1, height: "0.5px", background: "#222" }} />
+                  <span style={{ fontSize: 11, color: "#555", fontWeight: 500, whiteSpace: "nowrap" }}>
+                    내 마음 들여다보기
+                  </span>
+                  <div style={{ flex: 1, height: "0.5px", background: "#222" }} />
+                </div>
+                <div style={{ background: "#141414", borderRadius: 8, padding: "16px 18px" }}>
+                  <p style={{
+                    fontSize: 13, color: "#aaa",
+                    lineHeight: 2, margin: 0, whiteSpace: "pre-wrap",
+                  }}>
+                    {structured.emotion}
+                  </p>
+                </div>
               </div>
             )}
           </div>
