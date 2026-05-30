@@ -16,6 +16,23 @@ const RELATIONS = [
   { key: "직장동료", label: "직장동료", emoji: "💼" },
 ];
 
+// iOS Dark color tokens
+const C = {
+  bg: "#000000",
+  card: "#1C1C1E",
+  cardElevated: "#2C2C2E",
+  fill: "#3A3A3C",
+  label: "#FFFFFF",
+  labelSecondary: "rgba(235,235,245,0.6)",
+  labelTertiary: "rgba(235,235,245,0.3)",
+  separator: "rgba(255,255,255,0.08)",
+  accent: "#0A84FF",
+  blue: "#64B5F6",
+  orange: "#FF9F0A",
+  red: "#FF453A",
+  green: "#32D74B",
+};
+
 interface Emotion {
   reflection: string;
   normalize: string;
@@ -33,117 +50,45 @@ interface Structured {
 }
 
 function TempGauge({ value }: { value: number }) {
-  const color = value < 40 ? "#64B5F6" : value < 70 ? "#FFB74D" : "#E57373";
+  const color = value < 40 ? C.blue : value < 70 ? C.orange : C.red;
   const label =
-    value < 30
-      ? "냉담"
-      : value < 50
-      ? "미지근"
-      : value < 70
-      ? "위험"
-      : value < 85
-      ? "적신호"
-      : "폭발직전";
+    value < 30 ? "냉담" :
+    value < 50 ? "미지근" :
+    value < 70 ? "위험" :
+    value < 85 ? "적신호" : "폭발직전";
 
   return (
-    <div style={{ margin: "16px 0" }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-end",
-          marginBottom: 8,
-        }}
-      >
-        <span
-          style={{
-            fontFamily: "Pretendard, sans-serif",
-            fontSize: 13,
-            color: "#888",
-          }}
-        >
-          집착 온도
-        </span>
-        <span
-          style={{
-            fontFamily: "Pretendard, sans-serif",
-            fontSize: 40,
-            fontWeight: 700,
-            color,
-            lineHeight: 1,
-          }}
-        >
-          {value}°
-        </span>
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 12 }}>
+        <span style={{ fontSize: 13, color: C.labelSecondary, fontWeight: 400 }}>집착 온도</span>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
+          <span style={{ fontSize: 34, fontWeight: 700, color, letterSpacing: -1 }}>{value}</span>
+          <span style={{ fontSize: 17, fontWeight: 600, color }}>°</span>
+        </div>
       </div>
-      <div
-        style={{
-          position: "relative",
-          height: 6,
-          background: "#1a1a1a",
-          borderRadius: 3,
-        }}
-      >
-        <div
-          style={{
-            position: "absolute",
-            left: 0,
-            top: 0,
-            height: "100%",
-            width: `${value}%`,
-            background: color,
-            borderRadius: 3,
-          }}
-        />
+      <div style={{ position: "relative", height: 4, background: C.fill, borderRadius: 2 }}>
+        <div style={{
+          position: "absolute", left: 0, top: 0, height: "100%",
+          width: `${value}%`, background: color, borderRadius: 2,
+        }} />
       </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          marginTop: 6,
-        }}
-      >
-        <span
-          style={{
-            fontFamily: "Pretendard, sans-serif",
-            fontSize: 10,
-            color: "#555",
-          }}
-        >
-          0°
-        </span>
-        <span
-          style={{
-            fontFamily: "Pretendard, sans-serif",
-            fontSize: 11,
-            color,
-            fontWeight: 600,
-          }}
-        >
-          {label}
-        </span>
-        <span
-          style={{
-            fontFamily: "Pretendard, sans-serif",
-            fontSize: 10,
-            color: "#555",
-          }}
-        >
-          100°
-        </span>
+      <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
+        <span style={{ fontSize: 11, color: C.labelTertiary }}>0°</span>
+        <span style={{ fontSize: 11, fontWeight: 600, color }}>{label}</span>
+        <span style={{ fontSize: 11, color: C.labelTertiary }}>100°</span>
       </div>
     </div>
   );
 }
 
 const emotionColors: Record<string, string> = {
-  불안: "#5B8DEF",
-  외로움: "#3498DB",
-  두려움: "#8E44AD",
-  통제욕구: "#E74C3C",
-  의존감: "#E67E22",
-  분노: "#9B59B6",
-  질투: "#27AE60",
+  불안: "#5E9EFF",
+  외로움: "#64B5F6",
+  두려움: "#BF5AF2",
+  통제욕구: "#FF453A",
+  의존감: "#FF9F0A",
+  분노: "#BF5AF2",
+  질투: "#32D74B",
 };
 
 export default function MenheraBot() {
@@ -173,15 +118,11 @@ export default function MenheraBot() {
         body: JSON.stringify({
           situation,
           tone,
-          relation:
-            relation === "직접입력"
-              ? customRelation.trim() || "기타"
-              : relation,
+          relation: relation === "직접입력" ? (customRelation.trim() || "기타") : relation,
         }),
       });
       if (!res.ok) throw new Error();
 
-      // 스트림 전체를 버퍼링 후 JSON 파싱
       const reader = res.body!.getReader();
       const decoder = new TextDecoder();
       let raw = "";
@@ -194,212 +135,103 @@ export default function MenheraBot() {
       const parsed: Structured = JSON.parse(raw.trim());
       setStructured(parsed);
       setLoading(false);
-      setTimeout(
-        () =>
-          resultRef.current?.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-          }),
-        100
-      );
+      setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
 
-      // 말풍선 순차 표시
       for (let i = 0; i < parsed.messages.length; i++) {
-        await new Promise((r) => setTimeout(r, i === 0 ? 300 : 600));
+        await new Promise(r => setTimeout(r, i === 0 ? 300 : 600));
         setVisibleCount(i + 1);
       }
     } catch {
-      setError("판단 실패했어... 다시 시도해봐.");
+      setError("판단에 실패했어요. 다시 시도해주세요.");
       setLoading(false);
     }
   }
 
-  const emotionColor = structured
-    ? emotionColors[structured.emotion_label] ?? "#888"
-    : "#888";
+  const emotionColor = structured ? (emotionColors[structured.emotion_label] ?? C.accent) : C.accent;
+  const toneEmoji = TONES.find(t => t.key === submittedTone)?.emoji;
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#0d0d0d",
-        fontFamily: "Pretendard, sans-serif",
-        padding: "0 0 80px",
-      }}
-    >
-      <link
-        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"
-        rel="stylesheet"
-      />
+    <div style={{ minHeight: "100vh", background: C.bg, fontFamily: "Pretendard, -apple-system, sans-serif", color: C.label }}>
+      <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet" />
 
-      {/* 헤더 */}
-      <div
-        style={{ padding: "48px 24px 32px", borderBottom: "0.5px solid #222" }}
-      >
+      {/* 네비게이션 */}
+      <div style={{ padding: "60px 20px 8px" }}>
         <div style={{ maxWidth: 480, margin: "0 auto" }}>
-          <h1
-            style={{
-              fontSize: 28,
-              fontWeight: 700,
-              color: "#f0f0f0",
-              margin: 0,
-              lineHeight: 1.3,
-            }}
-          >
-            그 사람 행동,
-            <br />
-            분석해보자
+          <p style={{ fontSize: 13, color: C.labelTertiary, margin: "0 0 4px", fontWeight: 500 }}>MENHERA BOT</p>
+          <h1 style={{ fontSize: 34, fontWeight: 700, letterSpacing: -0.5, margin: 0, lineHeight: 1.2 }}>
+            그 사람 행동,<br />분석해보자
           </h1>
-          <p style={{ fontSize: 12, color: "#555", marginTop: 10 }}>
-            * 판단 결과는 멘헤라봇의 주관적 해석입니다
-          </p>
         </div>
       </div>
 
-      {/* 입력 영역 */}
-      <div style={{ maxWidth: 480, margin: "0 auto", padding: "32px 24px 0" }}>
-        {/* 관계 선택 */}
-        <div style={{ marginBottom: 24 }}>
-          <label
-            style={{
-              display: "block",
-              fontSize: 11,
-              color: "#666",
-              marginBottom: 10,
-              fontWeight: 500,
-            }}
-          >
-            상대방
-          </label>
+      <div style={{ maxWidth: 480, margin: "0 auto", padding: "24px 20px 80px" }}>
+
+        {/* 상대방 */}
+        <div style={{ marginBottom: 20 }}>
+          <p style={{ fontSize: 13, color: C.labelSecondary, fontWeight: 500, margin: "0 0 10px 4px" }}>상대방</p>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            {[
-              ...RELATIONS,
-              { key: "직접입력", label: "직접 입력", emoji: "✏️" },
-            ].map((r) => (
-              <button
-                key={r.key}
-                onClick={() => setRelation(r.key)}
-                style={{
-                  padding: "7px 14px",
-                  background: relation === r.key ? "#f0f0f0" : "transparent",
-                  border: `0.5px solid ${
-                    relation === r.key ? "#f0f0f0" : "#2a2a2a"
-                  }`,
-                  borderRadius: 20,
-                  cursor: "pointer",
-                  color: relation === r.key ? "#0d0d0d" : "#666",
-                  fontFamily: "Pretendard, sans-serif",
-                  fontSize: 12,
-                  fontWeight: relation === r.key ? 600 : 400,
-                  transition: "all 0.15s",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 4,
-                }}
-              >
-                <span>{r.emoji}</span>
-                {r.label}
+            {[...RELATIONS, { key: "직접입력", label: "직접 입력", emoji: "✏️" }].map(r => (
+              <button key={r.key} onClick={() => setRelation(r.key)} style={{
+                padding: "6px 14px",
+                background: relation === r.key ? C.accent : C.card,
+                borderRadius: 20, border: "none", cursor: "pointer",
+                color: relation === r.key ? "#fff" : C.labelSecondary,
+                fontSize: 13, fontWeight: relation === r.key ? 600 : 400,
+                fontFamily: "inherit", transition: "all 0.15s",
+                display: "flex", alignItems: "center", gap: 5,
+              }}>
+                <span style={{ fontSize: 14 }}>{r.emoji}</span>{r.label}
               </button>
             ))}
           </div>
           {relation === "직접입력" && (
             <input
               value={customRelation}
-              onChange={(e) => setCustomRelation(e.target.value)}
-              placeholder="예: 전 애인, 오랜만에 만나 친구..."
+              onChange={e => setCustomRelation(e.target.value)}
+              placeholder="예: 전 남자친구, 선배..."
               style={{
-                marginTop: 10,
-                width: "100%",
-                background: "#141414",
-                border: "0.5px solid #2a2a2a",
-                borderRadius: 8,
-                padding: "10px 14px",
-                color: "#e0e0e0",
-                fontFamily: "Pretendard, sans-serif",
-                fontSize: 13,
-                outline: "none",
-                boxSizing: "border-box",
-                transition: "border-color 0.2s",
+                marginTop: 10, width: "100%", background: C.card,
+                border: "none", borderRadius: 10, padding: "12px 14px",
+                color: C.label, fontFamily: "inherit", fontSize: 15,
+                outline: "none", boxSizing: "border-box",
               }}
-              onFocus={(e) => (e.target.style.borderColor = "#444")}
-              onBlur={(e) => (e.target.style.borderColor = "#2a2a2a")}
             />
           )}
         </div>
 
         {/* 상황 입력 */}
-        <div style={{ marginBottom: 24 }}>
-          <label
-            style={{
-              display: "block",
-              fontSize: 11,
-              color: "#666",
-              marginBottom: 10,
-              fontWeight: 500,
-            }}
-          >
-            상황
-          </label>
+        <div style={{ marginBottom: 20 }}>
+          <p style={{ fontSize: 13, color: C.labelSecondary, fontWeight: 500, margin: "0 0 10px 4px" }}>상황</p>
           <textarea
             value={situation}
-            onChange={(e) => setSituation(e.target.value)}
+            onChange={e => setSituation(e.target.value)}
             placeholder="카톡 읽씹 3시간 후에 인스타 스토리 올림..."
             rows={4}
             style={{
-              width: "100%",
-              background: "#141414",
-              border: "0.5px solid #2a2a2a",
-              borderRadius: 8,
-              padding: "14px 16px",
-              color: "#e0e0e0",
-              fontFamily: "Pretendard, sans-serif",
-              fontSize: 14,
-              lineHeight: 1.7,
-              resize: "none",
-              outline: "none",
-              boxSizing: "border-box",
-              transition: "border-color 0.2s",
+              width: "100%", background: C.card, border: "none",
+              borderRadius: 12, padding: "14px 16px", color: C.label,
+              fontFamily: "inherit", fontSize: 15, lineHeight: 1.6,
+              resize: "none", outline: "none", boxSizing: "border-box",
             }}
-            onFocus={(e) => (e.target.style.borderColor = "#444")}
-            onBlur={(e) => (e.target.style.borderColor = "#2a2a2a")}
           />
         </div>
 
-        {/* 레벨 선택 */}
-        <div style={{ marginBottom: 28 }}>
-          <label
-            style={{
-              display: "block",
-              fontSize: 11,
-              color: "#666",
-              marginBottom: 10,
-              fontWeight: 500,
-            }}
-          >
-            멘헤라 레벨
-          </label>
-          <div style={{ display: "flex", gap: 8 }}>
-            {TONES.map((t) => (
-              <button
-                key={t.key}
-                onClick={() => setTone(t.key)}
-                style={{
-                  flex: 1,
-                  padding: "10px 8px",
-                  background: tone === t.key ? "#f0f0f0" : "transparent",
-                  border: `0.5px solid ${
-                    tone === t.key ? "#f0f0f0" : "#2a2a2a"
-                  }`,
-                  borderRadius: 8,
-                  cursor: "pointer",
-                  color: tone === t.key ? "#0d0d0d" : "#666",
-                  fontFamily: "Pretendard, sans-serif",
-                  fontSize: 12,
-                  fontWeight: tone === t.key ? 600 : 400,
-                  transition: "all 0.15s",
-                }}
-              >
-                <div style={{ fontSize: 16, marginBottom: 4 }}>{t.emoji}</div>
+        {/* 레벨 선택 - 세그먼트 컨트롤 */}
+        <div style={{ marginBottom: 24 }}>
+          <p style={{ fontSize: 13, color: C.labelSecondary, fontWeight: 500, margin: "0 0 10px 4px" }}>멘헤라 레벨</p>
+          <div style={{ background: C.card, borderRadius: 10, padding: 3, display: "flex" }}>
+            {TONES.map(t => (
+              <button key={t.key} onClick={() => setTone(t.key)} style={{
+                flex: 1, padding: "7px 4px",
+                background: tone === t.key ? C.cardElevated : "transparent",
+                borderRadius: 8, border: "none", cursor: "pointer",
+                color: tone === t.key ? C.label : C.labelSecondary,
+                fontFamily: "inherit", fontSize: 12,
+                fontWeight: tone === t.key ? 600 : 400,
+                transition: "all 0.15s",
+                display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
+              }}>
+                <span style={{ fontSize: 16 }}>{t.emoji}</span>
                 {t.label}
               </button>
             ))}
@@ -411,16 +243,11 @@ export default function MenheraBot() {
           onClick={runJudge}
           disabled={loading || !situation.trim()}
           style={{
-            width: "100%",
-            padding: "14px",
-            background: loading || !situation.trim() ? "#1a1a1a" : "#f0f0f0",
-            border: "none",
-            borderRadius: 8,
-            cursor: loading || !situation.trim() ? "not-allowed" : "pointer",
-            color: loading || !situation.trim() ? "#444" : "#0d0d0d",
-            fontFamily: "Pretendard, sans-serif",
-            fontSize: 14,
-            fontWeight: 600,
+            width: "100%", padding: "15px",
+            background: loading || !situation.trim() ? C.card : C.accent,
+            border: "none", borderRadius: 12, cursor: loading || !situation.trim() ? "not-allowed" : "pointer",
+            color: loading || !situation.trim() ? C.labelTertiary : "#fff",
+            fontFamily: "inherit", fontSize: 17, fontWeight: 600,
             transition: "all 0.15s",
           }}
         >
@@ -428,99 +255,46 @@ export default function MenheraBot() {
         </button>
 
         {error && (
-          <p
-            style={{
-              fontSize: 12,
-              color: "#E57373",
-              marginTop: 12,
-              textAlign: "center",
-            }}
-          >
-            {error}
-          </p>
+          <p style={{ fontSize: 13, color: C.red, marginTop: 10, textAlign: "center" }}>{error}</p>
         )}
 
         {/* 결과 */}
         {structured && (
-          <div ref={resultRef} style={{ marginTop: 40 }}>
+          <div ref={resultRef} style={{ marginTop: 32 }}>
+
             {/* 온도 카드 */}
-            <div
-              style={{
-                background: "#141414",
-                border: "0.5px solid #222",
-                borderRadius: 12,
-                padding: "20px",
-                marginBottom: 24,
-              }}
-            >
+            <div style={{ background: C.card, borderRadius: 16, padding: "20px", marginBottom: 12 }}>
               <TempGauge value={structured.temperature} />
-              <div style={{ fontSize: 13, color: "#888", marginTop: 8 }}>
-                판단:{" "}
-                <span style={{ color: "#f0f0f0", fontWeight: 600 }}>
-                  {structured.verdict}
-                </span>
+              <div style={{ marginTop: 14, paddingTop: 14, borderTop: `1px solid ${C.separator}` }}>
+                <span style={{ fontSize: 13, color: C.labelSecondary }}>판단 </span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: C.label }}>{structured.verdict}</span>
               </div>
             </div>
 
-            {/* 채팅 말풍선 목록 */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {/* 말풍선 */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
               {structured.messages.slice(0, visibleCount).map((msg, i) => (
-                <div
-                  key={i}
-                  style={{
-                    display: "flex",
-                    gap: 10,
-                    alignItems: "flex-start",
-                    animation: "fadeUp 0.3s ease",
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 36,
-                      height: 36,
-                      borderRadius: "50%",
-                      background: "#1a1a1a",
-                      border: "0.5px solid #333",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: 18,
-                      flexShrink: 0,
-                    }}
-                  >
-                    {TONES.find((t) => t.key === submittedTone)?.emoji}
-                  </div>
+                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-end", animation: "fadeUp 0.25s ease" }}>
+                  {i === 0 && (
+                    <div style={{
+                      width: 32, height: 32, borderRadius: "50%",
+                      background: C.cardElevated,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 16, flexShrink: 0,
+                    }}>{toneEmoji}</div>
+                  )}
+                  {i > 0 && <div style={{ width: 32, flexShrink: 0 }} />}
                   <div style={{ flex: 1 }}>
                     {i === 0 && (
-                      <div
-                        style={{
-                          fontSize: 12,
-                          color: "#555",
-                          marginBottom: 6,
-                          fontWeight: 500,
-                        }}
-                      >
-                        멘헤라봇
-                      </div>
+                      <p style={{ fontSize: 11, color: C.labelTertiary, margin: "0 0 4px 2px", fontWeight: 500 }}>멘헤라봇</p>
                     )}
-                    <div
-                      style={{
-                        background: "#141414",
-                        border: `0.5px solid ${emotionColor}30`,
-                        borderRadius: i === 0 ? "0px 12px 12px 12px" : "12px",
-                        padding: "12px 16px",
-                      }}
-                    >
-                      <p
-                        style={{
-                          fontSize: 14,
-                          color: "#ddd",
-                          lineHeight: 1.8,
-                          margin: 0,
-                        }}
-                      >
-                        {msg}
-                      </p>
+                    <div style={{
+                      background: C.card,
+                      borderRadius: i === 0 ? "4px 16px 16px 16px" : "16px",
+                      padding: "10px 14px",
+                      display: "inline-block", maxWidth: "100%",
+                    }}>
+                      <p style={{ fontSize: 15, color: C.label, lineHeight: 1.5, margin: 0 }}>{msg}</p>
                     </div>
                   </div>
                 </div>
@@ -528,134 +302,59 @@ export default function MenheraBot() {
             </div>
 
             {/* 내 마음 들여다보기 */}
-            {visibleCount >= structured.messages.length &&
-              structured.emotion && (
-                <div style={{ marginTop: 32 }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 8,
-                      marginBottom: 12,
-                    }}
-                  >
-                    <span
-                      style={{
-                        fontSize: 11,
-                        color: "#555",
-                        fontWeight: 500,
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      내 마음 들여다보기
-                    </span>{" "}
-                  </div>
-                  <div
-                    style={{
-                      background: "#141414",
-                      borderRadius: 8,
-                      padding: "16px 18px",
-                    }}
-                  >
-                    {/* reflection + normalize + origin */}
-                    {/* 섹션 1: reflection + normalize + origin */}
-                    <p
-                      style={{
-                        fontSize: 13,
-                        color: "#aaa",
-                        lineHeight: 2,
-                        margin: 0,
-                      }}
-                    >
-                      {structured.emotion.reflection}{" "}
-                      {structured.emotion.normalize} {structured.emotion.origin}
+            {visibleCount >= structured.messages.length && structured.emotion && (
+              <div style={{ marginTop: 24 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+                  <div style={{ flex: 1, height: 1, background: C.separator }} />
+                  <span style={{ fontSize: 12, color: C.labelTertiary, fontWeight: 500, whiteSpace: "nowrap" }}>내 마음 들여다보기</span>
+                  <div style={{ flex: 1, height: 1, background: C.separator }} />
+                </div>
+
+                <div style={{ background: C.card, borderRadius: 16, overflow: "hidden" }}>
+                  {/* 섹션 1 */}
+                  <div style={{ padding: "18px 18px 16px" }}>
+                    <p style={{ fontSize: 14, color: C.labelSecondary, lineHeight: 1.8, margin: 0 }}>
+                      {structured.emotion.reflection} {structured.emotion.normalize} {structured.emotion.origin}
                     </p>
+                  </div>
 
-                    <div
-                      style={{
-                        height: "0.5px",
-                        background: "#222",
-                        margin: "16px 0",
-                      }}
-                    />
+                  <div style={{ height: 1, background: C.separator, margin: "0 18px" }} />
 
-                    {/* 섹션 2: action 강조 박스 */}
-                    <div
-                      style={{
-                        background: "#0d0d0d",
-                        border: "0.5px solid #333",
-                        borderRadius: 8,
-                        padding: "12px 14px",
-                      }}
-                    >
-                      <div
-                        style={{
-                          fontSize: 10,
-                          color: "#555",
-                          fontWeight: 600,
-                          marginBottom: 6,
-                          letterSpacing: "0.05em",
-                        }}
-                      >
-                        지금 해볼 것
-                      </div>
-                      <p
-                        style={{
-                          fontSize: 13,
-                          color: "#e0e0e0",
-                          lineHeight: 1.8,
-                          margin: 0,
-                          fontWeight: 500,
-                        }}
-                      >
-                        {structured.emotion.action}
-                      </p>
-                    </div>
+                  {/* 섹션 2: action */}
+                  <div style={{ padding: "16px 18px" }}>
+                    <p style={{ fontSize: 11, color: emotionColor, fontWeight: 600, margin: "0 0 6px", letterSpacing: "0.04em" }}>
+                      지금 해볼 것
+                    </p>
+                    <p style={{ fontSize: 15, color: C.label, lineHeight: 1.6, margin: 0, fontWeight: 500 }}>
+                      {structured.emotion.action}
+                    </p>
+                  </div>
 
-                    <div
-                      style={{
-                        height: "0.5px",
-                        background: "#222",
-                        margin: "16px 0",
-                      }}
-                    />
+                  <div style={{ height: 1, background: C.separator, margin: "0 18px" }} />
 
-                    {/* 섹션 3: reframe */}
-                    <div>
-                      <div
-                        style={{
-                          fontSize: 10,
-                          color: "#444",
-                          fontWeight: 600,
-                          marginBottom: 6,
-                          letterSpacing: "0.05em",
-                        }}
-                      >
-                        한 걸음 물러서서
-                      </div>
-                      <p
-                        style={{
-                          fontSize: 13,
-                          color: "#777",
-                          lineHeight: 2,
-                          margin: 0,
-                        }}
-                      >
-                        {structured.emotion.reframe}
-                      </p>
-                    </div>
+                  {/* 섹션 3: reframe */}
+                  <div style={{ padding: "16px 18px 18px" }}>
+                    <p style={{ fontSize: 11, color: C.labelTertiary, fontWeight: 500, margin: "0 0 6px", letterSpacing: "0.04em" }}>
+                      한 걸음 물러서서
+                    </p>
+                    <p style={{ fontSize: 14, color: C.labelTertiary, lineHeight: 1.8, margin: 0 }}>
+                      {structured.emotion.reframe}
+                    </p>
                   </div>
                 </div>
-              )}
+              </div>
+            )}
           </div>
         )}
       </div>
 
       <style>{`
         @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(8px); }
+          from { opacity: 0; transform: translateY(6px); }
           to { opacity: 1; transform: translateY(0); }
         }
+        * { -webkit-tap-highlight-color: transparent; }
+        ::placeholder { color: rgba(235,235,245,0.3); }
       `}</style>
     </div>
   );
