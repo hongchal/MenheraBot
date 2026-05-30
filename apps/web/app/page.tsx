@@ -17,7 +17,7 @@ const RELATIONS = [
   { key: "직접입력", label: "직접 입력" },
 ];
 
-const ACCENT = "#FF2D55";
+const ACCENT = "#8B1A2F";
 const LINE = "1px solid #000";
 
 interface Emotion {
@@ -159,7 +159,7 @@ export default function MenheraBot() {
 
   return (
     <div style={{
-      minHeight: "100vh", background: "#fff",
+      minHeight: "100vh", background: "#F7F6F3",
       fontFamily: "Pretendard, -apple-system, sans-serif",
       color: "#000",
     }}>
@@ -317,7 +317,7 @@ export default function MenheraBot() {
                   </p>
 
                   {/* action */}
-                  <div style={{ borderLeft: `3px solid ${ACCENT}`, paddingLeft: 14, marginBottom: 16 }}>
+                  <div style={{ paddingBottom: 16 }}>
                     <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: ACCENT, margin: "0 0 6px" }}>
                       지금 해볼 것
                     </p>
