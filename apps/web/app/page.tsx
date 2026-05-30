@@ -141,6 +141,7 @@ const emotionColors: Record<string, string> = {
 export default function MenheraBot() {
   const [situation, setSituation] = useState("");
   const [relation, setRelation] = useState("애인");
+  const [customRelation, setCustomRelation] = useState("");
   const [tone, setTone] = useState("menhera");
   const [structured, setStructured] = useState<Structured | null>(null);
   const [visibleCount, setVisibleCount] = useState(0);
@@ -159,7 +160,11 @@ export default function MenheraBot() {
       const res = await fetch("/internal/judge", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ situation, tone, relation }),
+        body: JSON.stringify({
+          situation,
+          tone,
+          relation: relation === "직접입력" ? (customRelation.trim() || "기타") : relation,
+        }),
       });
       if (!res.ok) throw new Error();
 
@@ -176,11 +181,18 @@ export default function MenheraBot() {
       const parsed: Structured = JSON.parse(raw.trim());
       setStructured(parsed);
       setLoading(false);
-      setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
+      setTimeout(
+        () =>
+          resultRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          }),
+        100
+      );
 
       // 말풍선 순차 표시
       for (let i = 0; i < parsed.messages.length; i++) {
-        await new Promise(r => setTimeout(r, i === 0 ? 300 : 600));
+        await new Promise((r) => setTimeout(r, i === 0 ? 300 : 600));
         setVisibleCount(i + 1);
       }
     } catch {
@@ -233,6 +245,69 @@ export default function MenheraBot() {
 
       {/* 입력 영역 */}
       <div style={{ maxWidth: 480, margin: "0 auto", padding: "32px 24px 0" }}>
+        {/* 관계 선택 */}
+        <div style={{ marginBottom: 24 }}>
+          <label
+            style={{
+              display: "block",
+              fontSize: 11,
+              color: "#666",
+              marginBottom: 10,
+              fontWeight: 500,
+            }}
+          >
+            상대방
+          </label>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {[...RELATIONS, { key: "직접입력", label: "직접 입력", emoji: "✏️" }].map((r) => (
+              <button
+                key={r.key}
+                onClick={() => setRelation(r.key)}
+                style={{
+                  padding: "7px 14px",
+                  background: relation === r.key ? "#f0f0f0" : "transparent",
+                  border: `0.5px solid ${relation === r.key ? "#f0f0f0" : "#2a2a2a"}`,
+                  borderRadius: 20,
+                  cursor: "pointer",
+                  color: relation === r.key ? "#0d0d0d" : "#666",
+                  fontFamily: "Pretendard, sans-serif",
+                  fontSize: 12,
+                  fontWeight: relation === r.key ? 600 : 400,
+                  transition: "all 0.15s",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 4,
+                }}
+              >
+                <span>{r.emoji}</span>{r.label}
+              </button>
+            ))}
+          </div>
+          {relation === "직접입력" && (
+            <input
+              value={customRelation}
+              onChange={(e) => setCustomRelation(e.target.value)}
+              placeholder="예: 전 남자친구, 선배, 오빠..."
+              style={{
+                marginTop: 10,
+                width: "100%",
+                background: "#141414",
+                border: "0.5px solid #2a2a2a",
+                borderRadius: 8,
+                padding: "10px 14px",
+                color: "#e0e0e0",
+                fontFamily: "Pretendard, sans-serif",
+                fontSize: 13,
+                outline: "none",
+                boxSizing: "border-box",
+                transition: "border-color 0.2s",
+              }}
+              onFocus={(e) => (e.target.style.borderColor = "#444")}
+              onBlur={(e) => (e.target.style.borderColor = "#2a2a2a")}
+            />
+          )}
+        </div>
+
         {/* 상황 입력 */}
         <div style={{ marginBottom: 24 }}>
           <label
@@ -269,32 +344,6 @@ export default function MenheraBot() {
             onFocus={(e) => (e.target.style.borderColor = "#444")}
             onBlur={(e) => (e.target.style.borderColor = "#2a2a2a")}
           />
-        </div>
-
-        {/* 관계 선택 */}
-        <div style={{ marginBottom: 24 }}>
-          <label style={{ display: "block", fontSize: 11, color: "#666", marginBottom: 10, fontWeight: 500 }}>
-            상대방
-          </label>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            {RELATIONS.map((r) => (
-              <button key={r.key} onClick={() => setRelation(r.key)} style={{
-                padding: "7px 14px",
-                background: relation === r.key ? "#f0f0f0" : "transparent",
-                border: `0.5px solid ${relation === r.key ? "#f0f0f0" : "#2a2a2a"}`,
-                borderRadius: 20,
-                cursor: "pointer",
-                color: relation === r.key ? "#0d0d0d" : "#666",
-                fontFamily: "Pretendard, sans-serif",
-                fontSize: 12,
-                fontWeight: relation === r.key ? 600 : 400,
-                transition: "all 0.15s",
-                display: "flex", alignItems: "center", gap: 4,
-              }}>
-                <span>{r.emoji}</span>{r.label}
-              </button>
-            ))}
-          </div>
         </div>
 
         {/* 레벨 선택 */}
@@ -360,7 +409,14 @@ export default function MenheraBot() {
         </button>
 
         {error && (
-          <p style={{ fontSize: 12, color: "#E57373", marginTop: 12, textAlign: "center" }}>
+          <p
+            style={{
+              fontSize: 12,
+              color: "#E57373",
+              marginTop: 12,
+              textAlign: "center",
+            }}
+          >
             {error}
           </p>
         )}
@@ -369,37 +425,83 @@ export default function MenheraBot() {
         {structured && (
           <div ref={resultRef} style={{ marginTop: 40 }}>
             {/* 온도 카드 */}
-            <div style={{
-              background: "#141414", border: "0.5px solid #222",
-              borderRadius: 12, padding: "20px", marginBottom: 24,
-            }}>
+            <div
+              style={{
+                background: "#141414",
+                border: "0.5px solid #222",
+                borderRadius: 12,
+                padding: "20px",
+                marginBottom: 24,
+              }}
+            >
               <TempGauge value={structured.temperature} />
               <div style={{ fontSize: 13, color: "#888", marginTop: 8 }}>
-                판단: <span style={{ color: "#f0f0f0", fontWeight: 600 }}>{structured.verdict}</span>
+                판단:{" "}
+                <span style={{ color: "#f0f0f0", fontWeight: 600 }}>
+                  {structured.verdict}
+                </span>
               </div>
             </div>
 
             {/* 채팅 말풍선 목록 */}
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {structured.messages.slice(0, visibleCount).map((msg, i) => (
-                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", animation: "fadeUp 0.3s ease" }}>
-                  <div style={{
-                    width: 36, height: 36, borderRadius: "50%",
-                    background: "#1a1a1a", border: "0.5px solid #333",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 18, flexShrink: 0,
-                  }}>👿</div>
+                <div
+                  key={i}
+                  style={{
+                    display: "flex",
+                    gap: 10,
+                    alignItems: "flex-start",
+                    animation: "fadeUp 0.3s ease",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 36,
+                      height: 36,
+                      borderRadius: "50%",
+                      background: "#1a1a1a",
+                      border: "0.5px solid #333",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: 18,
+                      flexShrink: 0,
+                    }}
+                  >
+                    👿
+                  </div>
                   <div style={{ flex: 1 }}>
                     {i === 0 && (
-                      <div style={{ fontSize: 12, color: "#555", marginBottom: 6, fontWeight: 500 }}>멘헤라봇</div>
+                      <div
+                        style={{
+                          fontSize: 12,
+                          color: "#555",
+                          marginBottom: 6,
+                          fontWeight: 500,
+                        }}
+                      >
+                        멘헤라봇
+                      </div>
                     )}
-                    <div style={{
-                      background: "#141414",
-                      border: `0.5px solid ${emotionColor}30`,
-                      borderRadius: i === 0 ? "0px 12px 12px 12px" : "12px",
-                      padding: "12px 16px",
-                    }}>
-                      <p style={{ fontSize: 14, color: "#ddd", lineHeight: 1.8, margin: 0 }}>{msg}</p>
+                    <div
+                      style={{
+                        background: "#141414",
+                        border: `0.5px solid ${emotionColor}30`,
+                        borderRadius: i === 0 ? "0px 12px 12px 12px" : "12px",
+                        padding: "12px 16px",
+                      }}
+                    >
+                      <p
+                        style={{
+                          fontSize: 14,
+                          color: "#ddd",
+                          lineHeight: 1.8,
+                          margin: 0,
+                        }}
+                      >
+                        {msg}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -410,15 +512,22 @@ export default function MenheraBot() {
             {visibleCount >= structured.messages.length && (
               <div style={{ marginTop: 16 }}>
                 {structured.emotion && (
-                  <div style={{
-                    background: "#141414",
-                    borderRadius: 8,
-                    padding: "16px 18px",
-                  }}>
-                    <p style={{
-                      fontSize: 13, color: "#aaa", lineHeight: 2,
-                      margin: 0, whiteSpace: "pre-wrap",
-                    }}>
+                  <div
+                    style={{
+                      background: "#141414",
+                      borderRadius: 8,
+                      padding: "16px 18px",
+                    }}
+                  >
+                    <p
+                      style={{
+                        fontSize: 13,
+                        color: "#aaa",
+                        lineHeight: 2,
+                        margin: 0,
+                        whiteSpace: "pre-wrap",
+                      }}
+                    >
                       {structured.emotion}
                     </p>
                   </div>
