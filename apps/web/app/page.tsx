@@ -16,12 +16,20 @@ const RELATIONS = [
   { key: "직장동료", label: "직장동료", emoji: "💼" },
 ];
 
+interface Emotion {
+  reflection: string;
+  normalize: string;
+  origin: string;
+  action: string;
+  reframe: string;
+}
+
 interface Structured {
   temperature: number;
   verdict: string;
   emotion_label: string;
   messages: string[];
-  emotion: string;
+  emotion: Emotion;
 }
 
 function TempGauge({ value }: { value: number }) {
@@ -518,28 +526,57 @@ export default function MenheraBot() {
             </div>
 
             {/* 내 마음 들여다보기 */}
-            {visibleCount >= structured.messages.length && structured.emotion && (
-              <div style={{ marginTop: 32 }}>
-                <div style={{
-                  display: "flex", alignItems: "center", gap: 8,
-                  marginBottom: 12,
-                }}>
-                  <div style={{ flex: 1, height: "0.5px", background: "#222" }} />
-                  <span style={{ fontSize: 11, color: "#555", fontWeight: 500, whiteSpace: "nowrap" }}>
-                    내 마음 들여다보기
-                  </span>
-                  <div style={{ flex: 1, height: "0.5px", background: "#222" }} />
+            {visibleCount >= structured.messages.length &&
+              structured.emotion && (
+                <div style={{ marginTop: 32 }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      marginBottom: 12,
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: 11,
+                        color: "#555",
+                        fontWeight: 500,
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      내 마음 들여다보기
+                    </span>{" "}
+                  </div>
+                  <div style={{ background: "#141414", borderRadius: 8, padding: "16px 18px" }}>
+                    {/* reflection + normalize + origin */}
+                    <p style={{ fontSize: 13, color: "#aaa", lineHeight: 2, margin: "0 0 16px" }}>
+                      {structured.emotion.reflection} {structured.emotion.normalize} {structured.emotion.origin}
+                    </p>
+
+                    {/* action 강조 박스 */}
+                    <div style={{
+                      background: "#0d0d0d",
+                      border: "0.5px solid #333",
+                      borderRadius: 8,
+                      padding: "12px 14px",
+                      marginBottom: 16,
+                    }}>
+                      <div style={{ fontSize: 10, color: "#555", fontWeight: 600, marginBottom: 6, letterSpacing: "0.05em" }}>
+                        지금 해볼 것
+                      </div>
+                      <p style={{ fontSize: 13, color: "#e0e0e0", lineHeight: 1.8, margin: 0, fontWeight: 500 }}>
+                        {structured.emotion.action}
+                      </p>
+                    </div>
+
+                    {/* reframe */}
+                    <p style={{ fontSize: 13, color: "#aaa", lineHeight: 2, margin: 0 }}>
+                      {structured.emotion.reframe}
+                    </p>
+                  </div>
                 </div>
-                <div style={{ background: "#141414", borderRadius: 8, padding: "16px 18px" }}>
-                  <p style={{
-                    fontSize: 13, color: "#aaa",
-                    lineHeight: 2, margin: 0, whiteSpace: "pre-wrap",
-                  }}>
-                    {structured.emotion}
-                  </p>
-                </div>
-              </div>
-            )}
+              )}
           </div>
         )}
       </div>
