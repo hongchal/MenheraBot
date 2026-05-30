@@ -550,17 +550,19 @@ export default function MenheraBot() {
                   </div>
                   <div style={{ background: "#141414", borderRadius: 8, padding: "16px 18px" }}>
                     {/* reflection + normalize + origin */}
-                    <p style={{ fontSize: 13, color: "#aaa", lineHeight: 2, margin: "0 0 16px" }}>
+                    {/* 섹션 1: reflection + normalize + origin */}
+                    <p style={{ fontSize: 13, color: "#aaa", lineHeight: 2, margin: 0 }}>
                       {structured.emotion.reflection} {structured.emotion.normalize} {structured.emotion.origin}
                     </p>
 
-                    {/* action 강조 박스 */}
+                    <div style={{ height: "0.5px", background: "#222", margin: "16px 0" }} />
+
+                    {/* 섹션 2: action 강조 박스 */}
                     <div style={{
                       background: "#0d0d0d",
                       border: "0.5px solid #333",
                       borderRadius: 8,
                       padding: "12px 14px",
-                      marginBottom: 16,
                     }}>
                       <div style={{ fontSize: 10, color: "#555", fontWeight: 600, marginBottom: 6, letterSpacing: "0.05em" }}>
                         지금 해볼 것
@@ -570,10 +572,17 @@ export default function MenheraBot() {
                       </p>
                     </div>
 
-                    {/* reframe */}
-                    <p style={{ fontSize: 13, color: "#aaa", lineHeight: 2, margin: 0 }}>
-                      {structured.emotion.reframe}
-                    </p>
+                    <div style={{ height: "0.5px", background: "#222", margin: "16px 0" }} />
+
+                    {/* 섹션 3: reframe */}
+                    <div>
+                      <div style={{ fontSize: 10, color: "#444", fontWeight: 600, marginBottom: 6, letterSpacing: "0.05em" }}>
+                        한 걸음 물러서서
+                      </div>
+                      <p style={{ fontSize: 13, color: "#777", lineHeight: 2, margin: 0 }}>
+                        {structured.emotion.reframe}
+                      </p>
+                    </div>
                   </div>
                 </div>
               )}
