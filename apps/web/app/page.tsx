@@ -50,32 +50,50 @@ function Divider() {
 }
 
 function TempGauge({ value }: { value: number }) {
-  const label =
-    value < 30 ? "COLD" :
-    value < 50 ? "MILD" :
-    value < 70 ? "HIGH" :
-    value < 85 ? "DANGER" : "CRITICAL";
+  const isHot = value >= 70;
+  const color = isHot ? ACCENT : "#000";
+  const statusKo =
+    value < 30 ? "냉담" :
+    value < 50 ? "미지근" :
+    value < 70 ? "위험" :
+    value < 85 ? "적신호" : "폭발직전";
 
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 12 }}>
-        <Label>집착 온도</Label>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 2 }}>
-          <span style={{ fontSize: 48, fontWeight: 700, letterSpacing: -2, color: value >= 70 ? ACCENT : "#000" }}>{value}</span>
-          <span style={{ fontSize: 20, fontWeight: 700, color: value >= 70 ? ACCENT : "#000" }}>°</span>
+      {/* 헤더: 라벨 ↔ 상태 */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#999" }}>
+          집착 온도
+        </span>
+        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color }}>
+          {statusKo}
+        </span>
+      </div>
+
+      {/* 숫자 — 주인공 */}
+      <div style={{ textAlign: "center", margin: "4px 0 20px", lineHeight: 1 }}>
+        <span style={{ fontSize: 96, fontWeight: 700, letterSpacing: -4, color }}>{value}</span>
+        <span style={{ fontSize: 36, fontWeight: 700, color, verticalAlign: "super", marginLeft: 2 }}>°</span>
+      </div>
+
+      {/* 바 + 눈금 */}
+      <div style={{ position: "relative" }}>
+        {/* 트랙 */}
+        <div style={{ height: 8, background: "#f0f0f0", position: "relative", overflow: "hidden" }}>
+          <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: `${value}%`, background: color, transition: "width 0.3s ease" }} />
+        </div>
+        {/* 눈금 (25, 50, 75) */}
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 8, display: "flex", alignItems: "stretch", pointerEvents: "none" }}>
+          {[25, 50, 75].map(t => (
+            <div key={t} style={{ position: "absolute", left: `${t}%`, top: 0, width: 1, height: "100%", background: "#fff", opacity: 0.6 }} />
+          ))}
         </div>
       </div>
-      <div style={{ position: "relative", height: 2, background: "#e0e0e0" }}>
-        <div style={{
-          position: "absolute", left: 0, top: 0, height: "100%",
-          width: `${value}%`,
-          background: value >= 70 ? ACCENT : "#000",
-        }} />
-      </div>
+
+      {/* 0° / 100° */}
       <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
-        <span style={{ fontSize: 10, color: "#999", fontWeight: 600, letterSpacing: "0.05em" }}>0°</span>
-        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", color: value >= 70 ? ACCENT : "#000" }}>{label}</span>
-        <span style={{ fontSize: 10, color: "#999", fontWeight: 600, letterSpacing: "0.05em" }}>100°</span>
+        <span style={{ fontSize: 10, color: "#bbb", fontWeight: 600 }}>0°</span>
+        <span style={{ fontSize: 10, color: "#bbb", fontWeight: 600 }}>100°</span>
       </div>
     </div>
   );
