@@ -293,14 +293,26 @@ export default function MenheraBot() {
 
               {/* 말풍선 */}
               <Label>분석 {toneEmoji}</Label>
-              <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {structured.messages.slice(0, visibleCount).map((msg, i) => (
-                  <div key={i} style={{
-                    padding: "14px 0",
-                    borderBottom: i < structured.messages.length - 1 ? "1px solid #f0f0f0" : "none",
-                    animation: "fadeUp 0.2s ease",
-                  }}>
-                    <p style={{ fontSize: 14, lineHeight: 1.6, margin: 0, color: "#000" }}>{msg}</p>
+                  <div key={i} style={{ display: "flex", gap: 8, alignItems: "flex-end", animation: "fadeUp 0.2s ease" }}>
+                    {i === 0 && (
+                      <div style={{
+                        width: 28, height: 28, borderRadius: "50%",
+                        background: "#000", flexShrink: 0,
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        fontSize: 14,
+                      }}>{toneEmoji}</div>
+                    )}
+                    {i > 0 && <div style={{ width: 28, flexShrink: 0 }} />}
+                    <div style={{
+                      background: "#EBEBEB",
+                      borderRadius: i === 0 ? "4px 14px 14px 14px" : "14px",
+                      padding: "10px 14px",
+                      maxWidth: "85%",
+                    }}>
+                      <p style={{ fontSize: 14, lineHeight: 1.6, margin: 0, color: "#000" }}>{msg}</p>
+                    </div>
                   </div>
                 ))}
               </div>
