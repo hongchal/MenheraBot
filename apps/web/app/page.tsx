@@ -120,6 +120,7 @@ function TempGauge({ value }: { value: number }) {
             color,
             verticalAlign: "super",
             marginLeft: 2,
+            marginBottom: 4,
           }}
         >
           °
@@ -468,7 +469,9 @@ export default function MenheraBot() {
               <TempGauge value={structured.temperature} />
 
               {/* 판단 */}
-              <p style={{ fontSize: 15, fontWeight: 700, margin: "16px 0 20px" }}>
+              <p
+                style={{ fontSize: 15, fontWeight: 700, margin: "16px 0 20px" }}
+              >
                 {structured.verdict}
               </p>
 
@@ -496,16 +499,25 @@ export default function MenheraBot() {
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
-                          fontSize: 14,
+                          lineHeight: 1,
                         }}
                       >
-                        {toneEmoji}
+                        <span
+                          style={{
+                            fontSize: 14,
+                            display: "block",
+                            lineHeight: 1,
+                          }}
+                        >
+                          {toneEmoji}
+                        </span>
                       </div>
                     )}
                     {i > 0 && <div style={{ width: 28, flexShrink: 0 }} />}
                     <div
                       style={{
-                        background: "#111111",
+                        background: "#fff",
+                        border: "1px solid #111111",
                         borderRadius: 0,
                         padding: "10px 14px",
                         maxWidth: "85%",
@@ -516,7 +528,7 @@ export default function MenheraBot() {
                           fontSize: 14,
                           lineHeight: 1.6,
                           margin: 0,
-                          color: "#fff",
+                          color: "#111111",
                         }}
                       >
                         {msg}
@@ -589,10 +601,10 @@ export default function MenheraBot() {
                       </p>
                       <p
                         style={{
-                          fontSize: 13,
+                          fontSize: 14,
                           lineHeight: 1.9,
-                          margin: 0,
-                          color: "#666",
+                          margin: "0 0 16px",
+                          color: "#333",
                         }}
                       >
                         {structured.emotion.reframe}
