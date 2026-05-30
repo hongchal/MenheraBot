@@ -377,8 +377,7 @@ export default function MenheraBot() {
                 {structured.emotion && (
                   <div style={{
                     background: "#141414",
-                    borderLeft: `3px solid ${emotionColor}`,
-                    borderRadius: "0 8px 8px 0",
+                    borderRadius: 8,
                     padding: "16px 18px",
                   }}>
                     <p style={{
