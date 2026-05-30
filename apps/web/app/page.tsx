@@ -13,6 +13,7 @@ interface Structured {
   verdict: string;
   emotion_label: string;
   messages: string[];
+  emotion: string;
 }
 
 function TempGauge({ value }: { value: number }) {
@@ -120,11 +121,13 @@ function TempGauge({ value }: { value: number }) {
 }
 
 const emotionColors: Record<string, string> = {
-  분노: "#9B59B6",
-  의존감: "#E67E22",
-  "통제 욕구": "#E74C3C",
+  불안: "#5B8DEF",
   외로움: "#3498DB",
   두려움: "#8E44AD",
+  통제욕구: "#E74C3C",
+  의존감: "#E67E22",
+  분노: "#9B59B6",
+  질투: "#27AE60",
 };
 
 export default function MenheraBot() {
@@ -368,17 +371,34 @@ export default function MenheraBot() {
               ))}
             </div>
 
-            {/* 감정 태그 */}
+            {/* 감정 태그 + emotion 카드 */}
             {visibleCount >= structured.messages.length && (
-              <div style={{ marginTop: 16, paddingLeft: 46 }}>
-                <span style={{
-                  background: `${emotionColor}20`, color: emotionColor,
-                  fontSize: 11, fontWeight: 600,
-                  padding: "3px 10px", borderRadius: 20,
-                  border: `0.5px solid ${emotionColor}40`,
-                }}>
-                  # {structured.emotion_label}
-                </span>
+              <div style={{ marginTop: 16 }}>
+                <div style={{ paddingLeft: 46, marginBottom: 16 }}>
+                  <span style={{
+                    background: `${emotionColor}20`, color: emotionColor,
+                    fontSize: 11, fontWeight: 600,
+                    padding: "3px 10px", borderRadius: 20,
+                    border: `0.5px solid ${emotionColor}40`,
+                  }}>
+                    # {structured.emotion_label}
+                  </span>
+                </div>
+                {structured.emotion && (
+                  <div style={{
+                    background: "#141414",
+                    borderLeft: `3px solid ${emotionColor}`,
+                    borderRadius: "0 8px 8px 0",
+                    padding: "16px 18px",
+                  }}>
+                    <p style={{
+                      fontSize: 13, color: "#aaa", lineHeight: 2,
+                      margin: 0, whiteSpace: "pre-wrap",
+                    }}>
+                      {structured.emotion}
+                    </p>
+                  </div>
+                )}
               </div>
             )}
           </div>
