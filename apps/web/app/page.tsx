@@ -8,6 +8,14 @@ const TONES = [
   { key: "ultra", label: "극한집착", emoji: "🔥" },
 ];
 
+const RELATIONS = [
+  { key: "애인", label: "애인", emoji: "💕" },
+  { key: "썸", label: "썸", emoji: "🌹" },
+  { key: "친구", label: "친구", emoji: "👥" },
+  { key: "가족", label: "가족", emoji: "🏠" },
+  { key: "직장동료", label: "직장동료", emoji: "💼" },
+];
+
 interface Structured {
   temperature: number;
   verdict: string;
@@ -132,6 +140,7 @@ const emotionColors: Record<string, string> = {
 
 export default function MenheraBot() {
   const [situation, setSituation] = useState("");
+  const [relation, setRelation] = useState("애인");
   const [tone, setTone] = useState("menhera");
   const [structured, setStructured] = useState<Structured | null>(null);
   const [visibleCount, setVisibleCount] = useState(0);
@@ -150,7 +159,7 @@ export default function MenheraBot() {
       const res = await fetch("/internal/judge", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ situation, tone }),
+        body: JSON.stringify({ situation, tone, relation }),
       });
       if (!res.ok) throw new Error();
 
@@ -260,6 +269,32 @@ export default function MenheraBot() {
             onFocus={(e) => (e.target.style.borderColor = "#444")}
             onBlur={(e) => (e.target.style.borderColor = "#2a2a2a")}
           />
+        </div>
+
+        {/* 관계 선택 */}
+        <div style={{ marginBottom: 24 }}>
+          <label style={{ display: "block", fontSize: 11, color: "#666", marginBottom: 10, fontWeight: 500 }}>
+            상대방
+          </label>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {RELATIONS.map((r) => (
+              <button key={r.key} onClick={() => setRelation(r.key)} style={{
+                padding: "7px 14px",
+                background: relation === r.key ? "#f0f0f0" : "transparent",
+                border: `0.5px solid ${relation === r.key ? "#f0f0f0" : "#2a2a2a"}`,
+                borderRadius: 20,
+                cursor: "pointer",
+                color: relation === r.key ? "#0d0d0d" : "#666",
+                fontFamily: "Pretendard, sans-serif",
+                fontSize: 12,
+                fontWeight: relation === r.key ? 600 : 400,
+                transition: "all 0.15s",
+                display: "flex", alignItems: "center", gap: 4,
+              }}>
+                <span>{r.emoji}</span>{r.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* 레벨 선택 */}
