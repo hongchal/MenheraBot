@@ -180,7 +180,7 @@ export default function MenheraBot() {
       <div style={{ maxWidth: 480, margin: "0 auto", padding: "0 24px 80px" }}>
 
         {/* 상대방 */}
-        <div style={{ borderBottom: LINE, padding: "20px 0" }}>
+        <div style={{ padding: "20px 0" }}>
           <Label>상대방</Label>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
             {RELATIONS.map(r => (
@@ -211,7 +211,7 @@ export default function MenheraBot() {
         </div>
 
         {/* 상황 */}
-        <div style={{ borderBottom: LINE, padding: "20px 0" }}>
+        <div style={{ padding: "20px 0" }}>
           <Label>상황</Label>
           <textarea
             value={situation}
@@ -228,7 +228,7 @@ export default function MenheraBot() {
         </div>
 
         {/* 멘헤라 레벨 */}
-        <div style={{ borderBottom: LINE, padding: "20px 0" }}>
+        <div style={{ padding: "20px 0" }}>
           <Label>멘헤라 레벨</Label>
           <div style={{ display: "flex", border: LINE }}>
             {TONES.map((t, i) => (
@@ -281,15 +281,11 @@ export default function MenheraBot() {
               {/* 온도 */}
               <TempGauge value={structured.temperature} />
 
-              <Divider />
-
               {/* 판단 */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                 <Label>판단</Label>
                 <p style={{ fontSize: 15, fontWeight: 700, margin: 0 }}>{structured.verdict}</p>
               </div>
-
-              <Divider />
 
               {/* 말풍선 */}
               <Label>분석 {toneEmoji}</Label>
@@ -339,7 +335,7 @@ export default function MenheraBot() {
                   </div>
 
                   {/* reframe */}
-                  <div style={{ borderTop: "1px solid #f0f0f0", paddingTop: 14 }}>
+                  <div style={{ paddingTop: 4 }}>
                     <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#999", margin: "0 0 6px" }}>
                       한 걸음 물러서서
                     </p>
