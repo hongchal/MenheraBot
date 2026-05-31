@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { saveJudgment } from "@/app/lib/db";
-import { appendToSheet } from "@/app/lib/sheets";
 
 const RATE_LIMIT = 3;
 const WINDOW_MS = 60 * 60 * 1000;
@@ -272,16 +271,9 @@ export async function POST(req: NextRequest) {
     emotion: { reflection, normalize, origin, action, reframe },
   };
 
-  // DB + Sheets 저장 (fire-and-forget — 응답 속도에 영향 없음)
+  // DB 저장 (fire-and-forget — 응답 속도에 영향 없음)
   const createdAt = new Date().toISOString();
   saveJudgment({
-    situation,
-    relation,
-    tone,
-    created_at: createdAt,
-    ...result,
-  }).catch(() => {});
-  appendToSheet({
     situation,
     relation,
     tone,
