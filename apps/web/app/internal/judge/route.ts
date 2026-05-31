@@ -228,7 +228,22 @@ export async function POST(req: NextRequest) {
 
   const aiData = await res.json();
   const raw: string = aiData.choices?.[0]?.message?.content ?? "";
-  const parsed = JSON.parse(raw.trim());
+  let parsed: {
+    off_topic?: boolean;
+    conflict?: boolean;
+    detected?: string;
+    temperature: number;
+    verdict: string;
+    emotion_label: string;
+    messages: string[];
+    emotion: { reflection: string; normalize: string; origin: string; action: string; reframe: string };
+  };
+  try {
+    parsed = JSON.parse(raw.trim());
+  } catch {
+    console.error("[judge] JSON parse failed. raw:", raw);
+    return new Response("AI response parse error", { status: 500 });
+  }
 
   if (parsed.off_topic) {
     return new Response("off_topic", { status: 422 });
