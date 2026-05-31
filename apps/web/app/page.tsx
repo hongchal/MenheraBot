@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 const TONES = [
   { key: "chill", label: "느긋하게", emoji: "🧊" },
@@ -58,16 +58,33 @@ function Divider() {
 }
 
 function TempGauge({ value }: { value: number }) {
-  const isHot = value >= 70;
+  const [displayed, setDisplayed] = useState(0);
+
+  useEffect(() => {
+    setDisplayed(0);
+    const duration = 1000;
+    const start = performance.now();
+    let raf: number;
+    function tick(now: number) {
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setDisplayed(Math.round(eased * value));
+      if (progress < 1) raf = requestAnimationFrame(tick);
+    }
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [value]);
+
+  const isHot = displayed >= 70;
   const color = isHot ? ACCENT : "#111111";
   const statusKo =
-    value < 30
+    displayed < 30
       ? "냉담"
-      : value < 50
+      : displayed < 50
       ? "미지근"
-      : value < 70
+      : displayed < 70
       ? "위험"
-      : value < 85
+      : displayed < 85
       ? "적신호"
       : "폭발직전";
 
@@ -107,20 +124,32 @@ function TempGauge({ value }: { value: number }) {
       </div>
 
       {/* 숫자 — 주인공 */}
-      <div style={{ textAlign: "center", margin: "4px 0 20px", lineHeight: 1 }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "flex-start",
+          margin: "4px 0 20px",
+        }}
+      >
         <span
-          style={{ fontSize: 96, fontWeight: 700, letterSpacing: -4, color }}
+          style={{
+            fontSize: 96,
+            fontWeight: 700,
+            letterSpacing: -4,
+            color,
+            lineHeight: 1,
+          }}
         >
-          {value}
+          {displayed}
         </span>
         <span
           style={{
             fontSize: 36,
             fontWeight: 700,
             color,
-            verticalAlign: "super",
             marginLeft: 2,
-            marginBottom: 4,
+            lineHeight: 1,
           }}
         >
           °
@@ -144,7 +173,7 @@ function TempGauge({ value }: { value: number }) {
               left: 0,
               top: 0,
               height: "100%",
-              width: `${value}%`,
+              width: `${displayed}%`,
               background: color,
               transition: "width 0.3s ease",
             }}
@@ -207,15 +236,20 @@ export default function MenheraBot() {
   const [visibleCount, setVisibleCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [offTopic, setOffTopic] = useState(false);
+  const [conflict, setConflict] = useState<{ detected: string; toneOverride?: string } | null>(null);
   const resultRef = useRef<HTMLDivElement>(null);
 
-  async function runJudge() {
+  async function runJudge(toneOverride?: string, ignoreConflict = false) {
     if (!situation.trim()) return;
+    const activeTone = toneOverride ?? tone;
     setLoading(true);
     setStructured(null);
-    setSubmittedTone(tone);
+    setSubmittedTone(activeTone);
     setVisibleCount(0);
     setError("");
+    setOffTopic(false);
+    setConflict(null);
 
     try {
       const res = await fetch("/internal/judge", {
@@ -223,13 +257,31 @@ export default function MenheraBot() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           situation,
-          tone,
+          tone: activeTone,
           relation:
             relation === "직접입력"
               ? customRelation.trim() || "기타"
               : relation,
+          ignoreConflict,
         }),
       });
+      if (res.status === 429) {
+        const { retryAfterMin } = await res.json();
+        setError(`잠깐, 너무 많이 분석했어. ${retryAfterMin}분 후에 다시 와.`);
+        setLoading(false);
+        return;
+      }
+      if (res.status === 409) {
+        const { detected } = await res.json();
+        setConflict({ detected, toneOverride: activeTone });
+        setLoading(false);
+        return;
+      }
+      if (res.status === 422) {
+        setOffTopic(true);
+        setLoading(false);
+        return;
+      }
       if (!res.ok) throw new Error();
 
       const reader = res.body!.getReader();
@@ -363,8 +415,9 @@ export default function MenheraBot() {
           <Label>상황</Label>
           <textarea
             value={situation}
-            onChange={(e) => setSituation(e.target.value)}
+            onChange={(e) => setSituation(e.target.value.slice(0, 1000))}
             placeholder="카톡 읽씹 3시간 후에 인스타 스토리 올림..."
+            maxLength={1000}
             rows={4}
             style={{
               width: "100%",
@@ -381,6 +434,16 @@ export default function MenheraBot() {
               background: "transparent",
             }}
           />
+          <div style={{ textAlign: "right", marginTop: 4 }}>
+            <span
+              style={{
+                fontSize: 11,
+                color: situation.length >= 900 ? ACCENT : "#bbb",
+              }}
+            >
+              {situation.length} / 1000
+            </span>
+          </div>
         </div>
 
         {/* 멘헤라 레벨 */}
@@ -420,7 +483,7 @@ export default function MenheraBot() {
         {/* 판단 버튼 */}
         <div style={{ padding: "20px 0" }}>
           <button
-            onClick={runJudge}
+            onClick={() => runJudge()}
             disabled={loading || !situation.trim()}
             style={{
               width: "100%",
@@ -441,6 +504,38 @@ export default function MenheraBot() {
           >
             {loading ? "분석 중..." : "판단하기"}
           </button>
+          {offTopic && (
+            <div
+              style={{
+                marginTop: 12,
+                padding: "12px 14px",
+                border: `1px solid ${ACCENT}`,
+                background: "#fff5f6",
+              }}
+            >
+              <p
+                style={{
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: ACCENT,
+                  margin: "0 0 4px",
+                }}
+              >
+                분석할 수 없는 내용이에요
+              </p>
+              <p
+                style={{
+                  fontSize: 12,
+                  color: "#555",
+                  margin: 0,
+                  lineHeight: 1.6,
+                }}
+              >
+                이 서비스는 연인·친구·가족 등 대인관계에서 상대방의 행동을
+                분석하는 용도예요. 관계 속 상황을 입력해주세요.
+              </p>
+            </div>
+          )}
           {error && (
             <p
               style={{
@@ -566,7 +661,7 @@ export default function MenheraBot() {
                           fontWeight: 700,
                           letterSpacing: "0.1em",
                           textTransform: "uppercase",
-                          color: ACCENT,
+                          color: "#333",
                           margin: "0 0 6px",
                         }}
                       >
@@ -577,8 +672,7 @@ export default function MenheraBot() {
                           fontSize: 14,
                           lineHeight: 1.7,
                           margin: 0,
-                          fontWeight: 600,
-                          color: "#111111",
+                          color: "#333",
                         }}
                       >
                         {structured.emotion.action}
@@ -593,7 +687,7 @@ export default function MenheraBot() {
                           fontWeight: 700,
                           letterSpacing: "0.1em",
                           textTransform: "uppercase",
-                          color: "#999",
+                          color: "#333",
                           margin: "0 0 6px",
                         }}
                       >
@@ -612,10 +706,79 @@ export default function MenheraBot() {
                     </div>
                   </div>
                 )}
+
             </div>
           </div>
         )}
       </div>
+
+      {/* 상대방 불일치 모달 */}
+      {conflict && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.4)",
+            display: "flex",
+            alignItems: "flex-end",
+            justifyContent: "center",
+            zIndex: 100,
+          }}
+          onClick={() => setConflict(null)}
+        >
+          <div
+            style={{
+              background: "#fff",
+              width: "100%",
+              maxWidth: 480,
+              padding: "28px 24px 36px",
+              borderTop: "2px solid #111111",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p style={{ fontSize: 17, fontWeight: 700, margin: "0 0 6px" }}>
+              혹시 {conflict.detected} 얘기야?
+            </p>
+            <p style={{ fontSize: 13, color: "#666", margin: "0 0 20px", lineHeight: 1.6 }}>
+              선택한 상대방과 상황이 다른 것 같아.
+            </p>
+            <div style={{ display: "flex", gap: 8 }}>
+              <button
+                onClick={() => setConflict(null)}
+                style={{
+                  flex: 1,
+                  padding: "13px",
+                  background: "#fff",
+                  border: LINE,
+                  cursor: "pointer",
+                  fontFamily: "inherit",
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: "#111111",
+                }}
+              >
+                맞아, 바꿀게
+              </button>
+              <button
+                onClick={() => runJudge(conflict.toneOverride, true)}
+                style={{
+                  flex: 1,
+                  padding: "13px",
+                  background: "#111111",
+                  border: LINE,
+                  cursor: "pointer",
+                  fontFamily: "inherit",
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: "#fff",
+                }}
+              >
+                아니, 계속해
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <style>{`
         @keyframes fadeUp {

@@ -34,6 +34,9 @@ web:
       initialDelaySeconds: 15
       periodSeconds: 30
   deepseekApiKey: "" # set via --set web.deepseekApiKey=... or a sealed secret
+  databaseUrl: "postgresql://menherabot:change-me-in-prod@menherabot-postgres:5432/menherabot"
+  googleSheetId: ""
+  googleServiceAccountJson: ""
 # ========== API (backend, Go) ==========
 api:
   enabled: true
