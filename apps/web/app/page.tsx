@@ -363,8 +363,9 @@ export default function MenheraBot() {
           <Label>상황</Label>
           <textarea
             value={situation}
-            onChange={(e) => setSituation(e.target.value)}
+            onChange={(e) => setSituation(e.target.value.slice(0, 1000))}
             placeholder="카톡 읽씹 3시간 후에 인스타 스토리 올림..."
+            maxLength={1000}
             rows={4}
             style={{
               width: "100%",
@@ -381,6 +382,11 @@ export default function MenheraBot() {
               background: "transparent",
             }}
           />
+          <div style={{ textAlign: "right", marginTop: 4 }}>
+            <span style={{ fontSize: 11, color: situation.length >= 900 ? ACCENT : "#bbb" }}>
+              {situation.length} / 1000
+            </span>
+          </div>
         </div>
 
         {/* 멘헤라 레벨 */}
