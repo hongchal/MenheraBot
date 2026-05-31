@@ -50,6 +50,9 @@ spec:
           #     | kubectl apply -f -
           # ArgoCD does not manage this secret (not in chart) → no prune.
           # optional:true → pod starts even if the secret is not present yet.
+          env:
+            - name: APP_ENV
+              value: "production"
           envFrom:
             - secretRef:
                 name: {{ include "menherabot.web.fullname" . }}-env
