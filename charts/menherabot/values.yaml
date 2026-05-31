@@ -10,7 +10,7 @@ web:
   enabled: true
   image:
     repository: ghcr.io/hongchal/menherabot-web
-    tag: sha-616096e # ⬅ CI overwrites this line via yq on every push to main
+    tag: sha-fe5bfc6 # ⬅ CI overwrites this line via yq on every push to main
     pullPolicy: IfNotPresent
   replicas: 1
   containerPort: 3000 # Next.js standalone listens on PORT=3000
@@ -33,15 +33,15 @@ web:
       path: /healthz
       initialDelaySeconds: 15
       periodSeconds: 30
-  # 🔐 DEEPSEEK_API_KEY and DATABASE_URL are NOT stored in git. They live in the
-  # `menherabot-web-env` Secret, created/rotated out-of-band via kubectl so no
-  # plaintext credential lands in the repo. The Secret is intentionally NOT
-  # ArgoCD-tracked (no instance label / tracking-id) → never pruned by sync.
-  #   kubectl -n menherabot create secret generic menherabot-web-env \
-  #     --from-literal=DEEPSEEK_API_KEY=<key> \
-  #     --from-literal=DATABASE_URL=<postgres-url> \
-  #     --dry-run=client -o yaml | kubectl apply -f -
-  #   kubectl -n menherabot rollout restart deploy/menherabot-web
+      # 🔐 DEEPSEEK_API_KEY and DATABASE_URL are NOT stored in git. They live in the
+      # `menherabot-web-env` Secret, created/rotated out-of-band via kubectl so no
+      # plaintext credential lands in the repo. The Secret is intentionally NOT
+      # ArgoCD-tracked (no instance label / tracking-id) → never pruned by sync.
+      #   kubectl -n menherabot create secret generic menherabot-web-env \
+      #     --from-literal=DEEPSEEK_API_KEY=<key> \
+      #     --from-literal=DATABASE_URL=<postgres-url> \
+      #     --dry-run=client -o yaml | kubectl apply -f -
+      #   kubectl -n menherabot rollout restart deploy/menherabot-web
 # ========== API (backend, Go) ==========
 api:
   enabled: true
