@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { saveJudgment } from "@/app/lib/db";
+import { appendToSheet } from "@/app/lib/sheets";
 
 const SYSTEM_PROMPT = `너는 "멘헤라 봇"이야. 상대방의 행동을 입력받으면 멘헤라 시각으로 분석해줘.
 
@@ -143,10 +145,19 @@ export async function POST(req: NextRequest) {
       spellCheck(parsed.emotion.reframe),
     ]);
 
-  return NextResponse.json({
+  const result = {
     ...parsed,
     verdict,
     messages,
     emotion: { reflection, normalize, origin, action, reframe },
-  });
+  };
+
+  // DB + Sheets 저장 (fire-and-forget — 응답 속도에 영향 없음)
+  const createdAt = new Date().toISOString();
+  Promise.all([
+    saveJudgment({ situation, relation, tone, created_at: createdAt, ...result }),
+    appendToSheet({ situation, relation, tone, created_at: createdAt, ...result }),
+  ]).catch(() => {});
+
+  return NextResponse.json(result);
 }
