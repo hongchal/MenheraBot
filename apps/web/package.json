@@ -9,7 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "google-auth-library": "^10.6.2",
     "next": "15.1.6",
     "pg": "^8.21.0",
     "react": "19.0.0",

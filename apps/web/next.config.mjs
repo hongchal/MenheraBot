@@ -3,7 +3,7 @@ const nextConfig = {
   output: 'standalone',
   reactStrictMode: true,
   poweredByHeader: false,
-  serverExternalPackages: ['pg', 'google-auth-library'],
+  serverExternalPackages: ['pg'],
 };
 
 export default nextConfig;
