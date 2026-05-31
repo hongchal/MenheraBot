@@ -10,7 +10,7 @@ web:
   enabled: true
   image:
     repository: ghcr.io/hongchal/menherabot-web
-    tag: sha-66fa185 # ⬅ CI overwrites this line via yq on every push to main
+    tag: sha-6523722 # ⬅ CI overwrites this line via yq on every push to main
     pullPolicy: IfNotPresent
   replicas: 1
   containerPort: 3000 # Next.js standalone listens on PORT=3000
